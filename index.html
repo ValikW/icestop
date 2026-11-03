@@ -45,6 +45,8 @@ main>section.alt{background:var(--alt)}
 .fx .head.seen h2,.fx .head.seen p{opacity:1;transform:none}
 /* маршрут под прокрутку: карта замирает, пока линия идёт от Москвы к точке «Мы здесь» */
 .fx #route .in{position:sticky}
+/* закреплённая карта целиком помещается в окно вместе с заголовком, плашка этапа всегда видна */
+.fx #route .map svg{max-height:max(300px,calc(100svh - 250px))}
 .stage{position:absolute;left:14px;bottom:14px;right:74px;max-width:420px;padding:12px 16px;border-radius:18px;font-size:15px;line-height:1.35}
 .stage{display:flex;gap:12px;align-items:center}
 .stage img{width:64px;height:64px;flex-shrink:0;object-fit:cover;border-radius:12px}
