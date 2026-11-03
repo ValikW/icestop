@@ -29,6 +29,35 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .in{max-width:980px;margin:0 auto;padding-left:max(22px,env(safe-area-inset-left,0px));padding-right:max(22px,env(safe-area-inset-right,0px))}
 section{padding-block:96px}
 section.alt{background:var(--alt)}
+/* 1. стопка секций: каждая следующая наезжает на предыдущую, та темнеет и чуть уменьшается (JS ставит --p и top) */
+main{position:relative;z-index:1;background:var(--bg)}
+main>section{background:var(--bg);transform-origin:50% 100%}
+main>section.alt{background:var(--alt)}
+/* уходящая секция целиком отъезжает назад карточкой: уменьшается, скругляется и гаснет под тёмной плёнкой (плёнка дешевле фильтра на телефонах) */
+.fx main>section{position:sticky;transform:scale(calc(1 - var(--p,0) * .08));border-radius:calc(var(--p,0) * 36px)}
+.fx main>section::after{content:"";position:absolute;inset:0;border-radius:inherit;background:#000;opacity:calc(var(--p,0) * .6);pointer-events:none}
+/* запас под первым экраном: следующий блок сначала закрывает пустоту, слова ребят остаются на виду дольше */
+.fx .hero{padding-bottom:calc(40px + 24vh)}
+.fx main>section+section{border-top-left-radius:28px;border-top-right-radius:28px;box-shadow:0 -24px 48px rgba(0,0,0,.45)}
+/* заголовки секций проявляются снизу */
+.fx .head h2,.fx .head p{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.2,1)}
+.fx .head p{transition-delay:.15s}
+.fx .head.seen h2,.fx .head.seen p{opacity:1;transform:none}
+/* маршрут под прокрутку: карта замирает, пока линия идёт от Москвы к точке «Мы здесь» */
+.fx #route .in{position:sticky}
+.stage{position:absolute;left:14px;bottom:14px;right:74px;max-width:420px;padding:12px 16px;border-radius:18px;font-size:15px;line-height:1.35}
+.stage{display:flex;gap:12px;align-items:center}
+.stage img{width:64px;height:64px;flex-shrink:0;object-fit:cover;border-radius:12px}
+.stage b{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:2px}
+.stage:empty{display:none}
+@media (max-width:640px){.stage{position:static;max-width:none;margin:10px;box-shadow:none}}
+.map .head-dot{fill:#fff;stroke:var(--accent);stroke-width:3;vector-effect:non-scaling-stroke}
+/* Liquid Glass: полупрозрачное стекло с размытием, бликом по верхнему краю и мягкой тенью */
+.glass{background:color-mix(in srgb,var(--tile) 55%,transparent);backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);
+  border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 -1px 0 rgba(255,255,255,.04),0 8px 28px rgba(0,0,0,.35)}
+/* 5. полоски прогресса заполняются при появлении */
+.fx .bar.wait i{width:0!important}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
 .num{font-variant-numeric:tabular-nums}
 a{color:var(--link);text-decoration:none}
@@ -49,14 +78,14 @@ a:hover{text-decoration:underline}
 @media (max-width:640px){.nav nav a:not(.pill){display:none}}
 
 /* герой */
-.hero{text-align:center;padding-block:72px 40px}
+.hero{text-align:center;padding-block:48px 40px}
 .now{display:inline-flex;align-items:center;gap:8px;font-size:15px;color:var(--muted)}
 .dot{width:8px;height:8px;border-radius:50%;background:#30d158;box-shadow:0 0 0 4px color-mix(in srgb,#30d158 25%,transparent)}
 .hero h1{font-size:clamp(44px,8vw,80px);line-height:1.05;letter-spacing:-.015em;margin:14px auto 0;max-width:16ch}
 .hero .sub{font-size:clamp(19px,2.4vw,24px);line-height:1.35;color:var(--muted);margin:18px auto 0;max-width:36ch}
 .pic{position:relative}
 .shot{max-width:980px;margin:48px auto 0;text-align:left}
-.photo{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:28px;background:var(--alt)}
+.photo{display:block;width:100%;aspect-ratio:12/5;max-height:40vh;object-fit:cover;object-position:50% 100%;border-radius:28px;background:var(--alt)}
 .duo{position:absolute;left:0;right:0;bottom:-84px;display:flex;justify-content:space-between;padding-inline:32px}
 .says{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
 .says:empty{display:none}
@@ -72,7 +101,7 @@ a:hover{text-decoration:underline}
 .note{padding:118px 0 0;text-align:center}
 .note .meta{font-size:14px;color:var(--muted)}
 .note p{margin:4px auto 0;font-size:19px;font-weight:600;line-height:1.35;max-width:40ch}
-@media (max-width:640px){.circle{width:112px;height:112px}.duo{bottom:-70px;padding-inline:12px}.note{padding:104px 0 0}.photo{border-radius:20px}}
+@media (max-width:640px){.circle{width:112px;height:112px}.duo{bottom:-70px;padding-inline:12px}.note{padding:104px 0 0}.photo{border-radius:20px;aspect-ratio:2/1}}
 .ctas{display:flex;justify-content:center;align-items:center;gap:28px;flex-wrap:wrap;margin-top:28px;font-size:19px}
 .chev::after{content:" ›"}
 
@@ -120,7 +149,7 @@ a:hover{text-decoration:underline}
 @media (prefers-reduced-motion:no-preference){.map .halo{animation:pulse 2s ease-out infinite;transform-box:fill-box;transform-origin:center}}
 @keyframes pulse{from{transform:scale(.6);opacity:.5}to{transform:scale(2.4);opacity:0}}
 .map-ctl{position:absolute;right:max(14px,env(safe-area-inset-right,0px));top:14px;display:grid;gap:8px}
-.map-ctl button{width:44px;height:44px;border-radius:50%;border:0;background:var(--nav);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);color:var(--ink);font:400 22px var(--f);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.map-ctl button{width:44px;height:44px;border-radius:50%;color:var(--ink);font:400 22px var(--f);cursor:pointer}
 .under{display:flex;justify-content:space-between;align-items:baseline;gap:8px 24px;flex-wrap:wrap;margin-top:20px;font-size:17px}
 .under .muted{color:var(--muted)}
 
@@ -158,6 +187,7 @@ section:not(.alt) .t{background:var(--alt)}
 .day p{margin:4px 0 0;color:var(--muted);font-size:15px}
 .day .km{font-size:17px;font-weight:600;text-align:right;white-space:nowrap}
 .day .km span{display:block;font-size:13px;font-weight:400;color:var(--muted)}
+.day .km:empty{display:none}
 .tag{font-size:13px;font-weight:400;color:var(--muted);margin-left:8px}
 .empty{padding:22px 0;color:var(--muted);text-align:center}
 @media (max-width:520px){.day{grid-template-columns:52px 1fr}.day .d{font-size:26px}.day .km{grid-column:2;text-align:left}.day .km span{display:inline;margin-left:8px}}
@@ -168,8 +198,10 @@ section:not(.alt) .t{background:var(--alt)}
 .fund .of{font-size:21px;color:var(--muted);margin-top:8px}
 .fund .bar{max-width:420px}
 .fund .bar i{background:#30d158}
-.fund .note{font-size:17px;color:var(--muted);margin:16px auto 0;max-width:40ch}
+.fund .note{padding:0;font-size:17px;color:var(--muted);margin:16px auto 0;max-width:40ch}
 .fund .pill{margin-top:28px}
+.draft{display:inline-block;margin:14px auto 0;max-width:46ch;font-size:13px;line-height:1.45;color:var(--muted);border:1px dashed var(--line);border-radius:12px;padding:8px 12px}
+.draft b{color:var(--accent);font-weight:600}
 .pay{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px;margin-top:40px;text-align:left}
 .pay div{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--tile);border-radius:18px;padding:16px 18px;min-width:0}
 .pay .l{font-size:13px;color:var(--muted)}
@@ -218,7 +250,8 @@ section .aud .t.total{background:var(--accent);color:var(--accent-ink)}
 .pc-price{font-size:clamp(40px,5vw,56px);font-weight:700;letter-spacing:-.03em;margin-top:24px}
 .steps{margin:14px 0 0;padding-left:22px;color:var(--muted);font-size:16px;display:grid;gap:6px}
 .pc-btns{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-top:28px;font-size:17px}
-footer{position:relative;overflow:hidden;padding-block:40px 0;border-top:1px solid var(--line);background:var(--bg)}
+/* 2. подвал-занавес: лежит под страницей (sticky внизу, под main) и открывается, когда она уезжает вверх */
+footer{position:sticky;bottom:0;z-index:0;overflow:hidden;padding-block:40px 0;border-top:1px solid var(--line);background:var(--bg)}
 .word{position:relative;z-index:1;font-size:clamp(84px,24vw,330px);font-weight:700;letter-spacing:-.06em;line-height:.8;text-align:center;margin:56px 0 0;white-space:nowrap;
   padding-bottom:.06em;color:var(--ink)}
 .word b{color:var(--accent)}
@@ -226,6 +259,20 @@ footer{position:relative;overflow:hidden;padding-block:40px 0;border-top:1px sol
 .floe{position:absolute;bottom:-14px;left:var(--x);background:var(--ice);border-radius:40% 55% 10% 12% / 60% 50% 8% 8%;opacity:.95}
 @media (prefers-reduced-motion:no-preference){.floe{left:0;animation:drift linear infinite}}
 @keyframes drift{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
+.mission{display:grid;justify-items:center;text-align:center;gap:24px}
+.m-quotes{display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:860px}
+@media (max-width:640px){.m-quotes{grid-template-columns:1fr}}
+.m-quotes figure{margin:0}
+.m-quotes blockquote{margin:0;font-size:clamp(20px,2.6vw,26px);line-height:1.3;font-weight:600;color:var(--ink);quotes:"«" "»"}
+.m-quotes blockquote::before{content:open-quote}.m-quotes blockquote::after{content:close-quote}
+.m-quotes figcaption{margin-top:10px;font-size:15px;color:var(--muted)}
+.up{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border-radius:980px;color:var(--ink);font-size:15px}
+.up:hover{text-decoration:none}
+/* плавающая кнопка «Наверх» */
+.to-top{position:fixed;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:20;width:48px;height:48px;border-radius:50%;
+  display:grid;place-items:center;color:var(--ink);font-size:20px;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .3s,transform .3s}
+.to-top.show{opacity:1;transform:none;pointer-events:auto}
+.to-top:hover{text-decoration:none}
 footer .in{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
 .links{display:flex;gap:20px;flex-wrap:wrap}
 .links a{font-size:14px;min-height:44px;display:inline-flex;align-items:center}
@@ -233,7 +280,7 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
 @media (prefers-reduced-motion:no-preference){.bar i{transition:width 1s cubic-bezier(.2,.8,.2,1)}}
 </style>
 
-<header class="nav">
+<header class="nav glass">
   <div class="in">
     <a class="logo" href="#top">ice.stop</a>
     <nav aria-label="Разделы">
@@ -258,7 +305,7 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
       <figure class="shot" style="margin-bottom:0">
         <div class="pic"><div id="photo"></div>
         <div class="duo" id="duo"></div></div>
-        <figcaption class="note"><div class="says" id="says"></div><p id="helloText"></p><div class="meta">Нажмите на кружочек, чтобы включить звук</div></figcaption>
+        <figcaption class="note"><div class="says" id="says"></div><p id="helloText"></p><div class="meta">Нажмите на кружочек, чтобы включить звук</div><div><p class="draft" id="helloDraft"></p></div></figcaption>
       </figure>
     </div>
   </section>
@@ -278,9 +325,11 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
       <div class="head"><h2>От Москвы до края Земли.</h2><p>Попутки по суше, яхты и корабли через океан.</p></div>
       <div class="map" id="map">
         <svg id="mapSvg" role="img" aria-label="Карта маршрута и текущее местоположение"></svg>
-        <div class="map-ctl"><button id="zin" aria-label="Приблизить">+</button><button id="zout" aria-label="Отдалить">−</button><button id="zme" aria-label="Показать, где они сейчас">◎</button></div>
+        <div class="map-ctl"><button class="glass" id="zin" aria-label="Приблизить">+</button><button class="glass" id="zout" aria-label="Отдалить">−</button><button class="glass" id="zme" aria-label="Показать, где они сейчас">◎</button></div>
+        <div class="stage glass" id="stage" aria-live="polite"></div>
       </div>
       <div class="under"><span><span class="muted">Следующая цель:</span> <b id="nextGoal"></b> <span class="muted" id="nextNote"></span></span><a class="chev" id="mapLink" target="_blank" rel="noopener">Открыть в Картах</a></div>
+      <div style="text-align:center"><p class="draft" id="mapDraft"></p></div>
     </div>
   </section>
 
@@ -304,8 +353,8 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
 
   <section id="diary">
     <div class="in">
-      <div class="head"><h2>Дневник.</h2><p class="num" id="dayCount"></p></div>
-      <div class="seg-ctl"><div role="group" aria-label="Фильтр дней">
+      <div class="head"><h2>Дневник.</h2><p class="num" id="dayCount"></p><div><p class="draft" id="diaryDraft"></p></div></div>
+      <div class="seg-ctl"><div class="glass" role="group" aria-label="Фильтр дней">
         <button class="chip" data-f="all" aria-pressed="true">Все</button>
         <button class="chip" data-f="road" aria-pressed="false">Трасса</button>
         <button class="chip" data-f="sea" aria-pressed="false">По воде</button>
@@ -324,7 +373,7 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
         <div class="addr"><i></i><i></i><i></i></div>
       </div>
       <div class="pc-text">
-        <div class="seg-ctl pc-switch"><div role="group" aria-label="Какую открытку">
+        <div class="seg-ctl pc-switch"><div class="glass" role="group" aria-label="Какую открытку">
           <button class="chip" data-pc="road" aria-pressed="true">С дороги</button>
           <button class="chip" data-pc="ice" aria-pressed="false">Из Антарктиды</button>
         </div></div>
@@ -345,6 +394,7 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
       <div class="bar" id="fundBarWrap" role="progressbar" aria-label="Собрано" aria-valuemin="0" aria-valuemax="100"><i id="fundBar"></i></div>
       <p class="note" id="fundNote"></p>
       <a class="pill" id="donateBtn" target="_blank" rel="noopener">Поддержать онлайн</a>
+      <div><p class="draft" id="donateDraft"></p></div>
       <div class="pay" id="pay"></div>
     </div>
   </section>
@@ -370,8 +420,17 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
       <div class="ctas" style="margin-top:36px"><a class="pill" id="partnerBtn" target="_blank" rel="noopener">Обсудить сотрудничество</a></div>
     </div>
   </section>
+  <section class="alt" id="mission-sec">
+  <div class="in mission">
+    <h2 class="eyebrow">Наша миссия</h2>
+    <div class="m-quotes" id="mission"></div>
+    <p class="draft" id="missionDraft"></p>
+    <a class="up glass" href="#top">↑ Наверх</a>
+  </div>
+  </section>
 </main>
 
+<a class="to-top glass" id="toTop" href="#top" aria-label="Наверх, к началу сайта">↑</a>
 <footer>
   <div class="in"><span>Двое автостопом в Антарктиду · сейчас <span id="footNow"></span></span><div class="links" id="links"></div></div>
   <div class="word" aria-hidden="true">ice<b>.</b>stop</div>
@@ -438,6 +497,8 @@ const DATA = {
     {name:"Семён", video:"media/hello-1.mp4", say:"В Антарктиду за 100 долларов. Как? Сами не знаем — но едем!"},
     {name:"Рустам", video:"media/hello-2.mp4", say:"Тут видно, где мы прямо сейчас. Заглядывай каждый день!"},
   ],
+  // временная пометка для ребят под кружочками; пусто — не показывается
+  helloDraft:"Для Семёна и Рустама: здесь будут ваши приветственные слова и кружочки. Можете махать друг другу: Семён слева — машет вправо, к Рустаму, Рустам справа — машет влево, к Семёну.",
   helloText: "Привет! Мы едем автостопом на край Земли. Здесь видно, где мы сейчас.",
   currentKm: 4167, // по дорогам между точками track
   nowPlace: "Ирак · Захо",
@@ -446,7 +507,9 @@ const DATA = {
   hitch: {cars:31, avgWait:"42 мин", longestWait:"5 ч 30 мин", trucks:9, countries:4, refusals:"~700"},
   nights: {"Палатка":9, "У водителей":8, "Каучсёрфинг":6, "Гестхаус":3},
   fund: {raised:240, goal:5000, currency:"$", note:"на визы, снаряжение для холода и страховку для антарктического участка",
-    donateUrl:"https://boosty.to/"}, // ссылка на их страницу доната (Boosty, DonationAlerts, Tribute и т.п.)
+    donateUrl:"https://boosty.to/",
+    // временная пометка для ребят под кнопкой; убрать (сделать пустой), когда подключат оплату
+    draftNote:"Для Семёна и Рустама: кнопка пока заглушка. Сюда подключается любая монетизация — Tribute, Boosty, ЮKassa. Для Tribute достаточно вставить ссылку и вебхук."}, // ссылка на их страницу доната (Boosty, DonationAlerts, Tribute и т.п.)
   pay: [
     {name:"Карта", value:"0000 0000 0000 0000"},
     {name:"USDT TRC20", value:"Txxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"},
@@ -465,13 +528,22 @@ const DATA = {
   // открытки: price — цена, payUrl — ссылка на оплату, telegram — ник, кому присылать адрес (без @)
   postcard: {price:"2 000 ₽", country:"Ирака", city:"Захо", payUrl:"https://boosty.to/", telegram:"",
     antarctica: {price:"5 000 ₽", payUrl:"https://boosty.to/"}},
+  // миссия — слова ребят в подвале; draft:true показывает пометку, что текст временный
+  mission: {draft:true, quotes:[
+    {who:"Семён", text:"Мы хотим показать, что мир добрее, чем кажется из новостей. Каждая попутка — доказательство."},
+    {who:"Рустам", text:"Без денег, без билетов — только люди, которые остановились. Доедем до Антарктиды и расскажем, какой мир на самом деле."},
+  ]},
   links: [
     {name:"Instagram Семёна", url:"https://www.instagram.com/eazylifeshow/"},
     {name:"Telegram Семёна", url:"https://t.me/easylifeshow"},
     {name:"Instagram Рустама", url:"https://www.instagram.com/rustam.shikari/"},
     {name:"Telegram Рустама", url:"https://t.me/Extraordinarione"},
   ],
-  // дни: type road | sea | rest
+  // временная пометка для ребят под заголовком дневника; пусто — не показывается
+  diaryDraft:"Заметка для Семёна и Рустама: дневник собран автоматически из ваших постов в Telegram. Сделано быстро, поэтому взяты только ключевые куски. Дальше всё будет само: любой кружочек, голосовое или текст в Telegram превратится в заметку здесь. Настраивается быстро.",
+  // временная пометка для ребят под картой; пусто — не показывается
+  mapDraft:"Для Семёна и Рустама: пока листаешь карту, внизу появляются заметки по дням. К каждой можно добавить фото этого дня — поле photo у записи в дневнике, и оно встанет рядом с текстом. Так будет живее.",
+  // дни: type photo — необязательная ссылка на фото дня, показывается в плашке этапа на карте road | sea | rest
   days: [
     {n:44, date:"2026-11-02", type:"road", title:"Ирак! Первый же водитель дал денег и посадил в такси", from:"Батман", to:"Захо", km:229},
     {n:43, date:"2026-11-01", type:"road", title:"Через всю Турцию к иракской границе", from:"Батуми", to:"Батман", km:645},
@@ -551,7 +623,7 @@ function renderDays(f) {
     const dt = new Date(d.date).toLocaleDateString("ru-RU",{weekday:"short",day:"numeric",month:"short"});
     const tag = d.type === "rest" ? '<span class="tag">стоянка</span>' : d.type === "sea" ? '<span class="tag">по воде</span>' : d.type === "fail" ? '<span class="tag" style="color:#ff453a">не пустили</span>' : "";
     const path = d.to ? `${d.from} → ${d.to}` : d.from;
-    const km = d.km ? `${fmt(d.km)} км${d.cars ? `<span>${d.cars} маш.</span>` : ""}` : "";
+    const km = d.km ? `${fmt(d.km)} км<span>проехали по дорогам</span>` : "";
     return `<li class="day"><div class="d num">${d.n}<span>${dt}</span></div><div><h3>${d.title}${tag}</h3><p>${path}</p></div><div class="km num">${km}</div></li>`;
   }).join("");
 }
@@ -560,6 +632,8 @@ document.querySelectorAll(".chip[data-f]").forEach(b => b.onclick = () => {
   renderDays(b.dataset.f);
 });
 renderDays("all");
+$("mapDraft").innerHTML = DATA.mapDraft ? `<b>Черновик.</b> ${DATA.mapDraft}` : ""; $("mapDraft").hidden = !DATA.mapDraft;
+$("diaryDraft").innerHTML = DATA.diaryDraft ? `<b>Черновик.</b> ${DATA.diaryDraft}` : ""; $("diaryDraft").hidden = !DATA.diaryDraft;
 
 const F = DATA.fund, fp = F.raised / F.goal * 100;
 $("raised").textContent = F.currency + fmt(F.raised);
@@ -568,6 +642,7 @@ $("fundPct").textContent = fp.toFixed(1).replace(".", ",") + "% собрано";
 $("fundBar").style.width = Math.min(fp, 100) + "%";
 $("fundBarWrap").setAttribute("aria-valuenow", Math.round(fp));
 $("fundNote").textContent = F.note;
+$("donateDraft").innerHTML = F.draftNote ? `<b>Черновик.</b> ${F.draftNote}` : ""; $("donateDraft").hidden = !F.draftNote;
 $("donateBtn").href = F.donateUrl;
 $("mapLink").href = `https://www.google.com/maps?q=${DATA.coords.join(",")}`;
 $("pay").innerHTML = DATA.pay.map((p,i) =>
@@ -579,6 +654,7 @@ $("pay").onclick = e => {
     () => { b.textContent = "Скопировано"; setTimeout(() => b.textContent = "Скопировать", 1500); },
     () => getSelection().selectAllChildren(code));
 };
+var routeScrub, routeFrac; // var без значения: drawMap вызывается раньше этой строки и заполняет их
 function drawMap() {
   const W = 1000, H = 640, S = DATA.stops, ll = p => [p[1], p[0]]; // [lat,lon] → [lon,lat]
   const svg = d3.select("#mapSvg").attr("viewBox", `0 0 ${W} ${H}`);
@@ -621,6 +697,24 @@ function drawMap() {
   xmarks.append("title").text(d => `${d.note} · ${new Date(d.date).toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}`);
   const dlabels = g.selectAll(".dlabel").data(dets).join("text").attr("class", "dlabel")
     .attr("x", d => proj(ll(d.coords))[0]).attr("y", d => proj(ll(d.coords))[1]).text(d => d.note);
+  // прорисовка пути по доле p (0…1): префикс линии по дорогам + «голова»; точки, подписи и попытки появляются по мере прохождения
+  const flat = R.track.flat(), cum = [0];
+  for (let i = 1; i < flat.length; i++) cum.push(cum[i - 1] + d3.geoDistance(flat[i - 1], flat[i]));
+  const Ltot = cum.at(-1) || 1, legStart = [0];
+  R.track.forEach(leg => legStart.push(legStart.at(-1) + d3.geoLength({type:"LineString", coordinates: leg})));
+  const fracOf = place => { const i = (DATA.track || []).findIndex(t => t.place.split(" · ").pop() === place); return i < 0 ? 1 : legStart[i] / legStart.at(-1); };
+  const doneEl = g.select(".seg.done");
+  const head = g.append("circle").attr("class", "head-dot").attr("r", 0);
+  let showUpTo = () => {};
+  const scrub = p => {
+    if (!flat.length) return;
+    const target = p * Ltot; let i = 1; while (i < flat.length - 1 && cum[i] < target) i++;
+    const t = cum[i] === cum[i - 1] ? 1 : Math.max(0, Math.min(1, (target - cum[i - 1]) / (cum[i] - cum[i - 1])));
+    const pt = d3.geoInterpolate(flat[i - 1], flat[i])(t);
+    doneEl.attr("d", path({type:"LineString", coordinates: [...flat.slice(0, i), pt]}));
+    const [hx, hy] = proj(pt); head.attr("cx", hx).attr("cy", hy).style("opacity", p > 0 && p < 1 ? 1 : 0);
+    showUpTo(p);
+  };
   const tdots = g.selectAll(".tpt").data(DATA.track || []).join("circle").attr("class", "stop done tpt")
     .attr("cx", t => proj(ll(t.coords))[0]).attr("cy", t => proj(ll(t.coords))[1]);
   tdots.append("title").text(t => `${t.place} · ${new Date(t.date).toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}`);
@@ -640,12 +734,21 @@ function drawMap() {
   const city = t => t.place.split(" · ").pop();
   const tlabels = g.selectAll(".tlabel").data((DATA.track || []).filter(t => !labeled.has(city(t)) && city(t) !== city({place: DATA.nowPlace})))
     .join("text").attr("class", "tlabel").attr("x", t => proj(ll(t.coords))[0]).attr("y", t => proj(ll(t.coords))[1]).text(city);
+  const armFrac = fracOf("Тбилиси") + 0.002;
+  showUpTo = p => {
+    tdots.style("opacity", t => fracOf(t.place.split(" · ").pop()) <= p + 1e-6 ? 1 : 0);
+    tlabels.style("opacity", t => fracOf(t.place.split(" · ").pop()) <= p + 1e-6 ? 1 : 0);
+    g.selectAll(".det,.xmark,.dlabel").style("opacity", p >= armFrac ? 1 : 0);
+    // пройденные остановки плана появляются, когда до них дошла линия; будущие видны всегда
+    const vis = st => st.km > DATA.currentKm || fracOf(st.name) <= p + 1e-6 ? 1 : 0;
+    dots.style("opacity", vis); labels.style("opacity", vis);
+  };
   // размеры задаются в экранных пикселях: u — сколько единиц карты в одном пикселе экрана (на телефоне карта сжата в ~3 раза)
   let K = 1;
   const px = () => W / (svg.node().clientWidth || W);
   const size = k => {
     K = k; const u = px() / k;
-    dots.attr("r", 5*u); tdots.attr("r", 3.5*u); halo.attr("r", 15*u); dot.attr("r", 7*u);
+    dots.attr("r", 5*u); tdots.attr("r", 3.5*u); halo.attr("r", 15*u); dot.attr("r", 7*u); head.attr("r", 6*u);
     const font = (sel, f, dx, dy) => sel.attr("dx", dx*u).attr("dy", dy*u).style("font-size", f*u + "px").style("stroke-width", 2.5*u + "px");
     font(labels, 14, 9, 5); font(tlabels, 13, 7, 4); font(meLabel, 15, 12, -10);
     font(xmarks, 14, 0, 5); font(dlabels, 12, 0, 20); dlabels.attr("text-anchor", "middle");
@@ -680,9 +783,19 @@ function drawMap() {
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const fly = t => svg.interrupt().transition().duration(still ? 0 : 1400).ease(d3.easeCubicInOut).call(zoom.transform, t);
   $("zme").onclick = () => fly(closeUp);
+  routeScrub = scrub; routeFrac = fracOf;
+  // с эффектами прокрутки карта сразу показывает весь пройденный путь крупно, чтобы было видно, как он рисуется
+  if (!still) {
+    const all = [...(DATA.track || []).map(t => proj(ll(t.coords))), [mx, my], ...(next ? [proj(ll(next.ll))] : [])];
+    const [a0, a1] = d3.extent(all, q => q[0]), [b0, b1] = d3.extent(all, q => q[1]);
+    const kAll = Math.max(1, Math.min(12, 0.8 / Math.max((a1 - a0) / W, (b1 - b0) / H)));
+    svg.call(zoom.transform, d3.zoomIdentity.translate(W/2, H/2).scale(kAll).translate(-(a0 + a1) / 2, -(b0 + b1) / 2));
+  }
   // наведение курсора — плавно к ребятам, курсор ушёл — обратно ко всему маршруту
   const mapEl = $("map");
-  if (matchMedia("(hover: hover)").matches) {
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    // с эффектами прокрутки карта управляется прорисовкой маршрута, приближение — кнопкой ◎
+  } else if (matchMedia("(hover: hover)").matches) {
     mapEl.addEventListener("mouseenter", () => fly(closeUp));
     mapEl.addEventListener("mouseleave", () => fly(d3.zoomIdentity));
   } else if ("IntersectionObserver" in window) {
@@ -694,22 +807,23 @@ function drawMap() {
 // фото или иллюстрация дороги (заглушка, пока нет настоящего фото)
 $("photo").outerHTML = DATA.photo
   ? `<img class="photo" src="${DATA.photo}" alt="Ребята на трассе">`
-  : `<svg class="photo" viewBox="0 0 1600 900" role="img" aria-label="Иллюстрация: дорога в горах Кавказа">
+  : `<svg class="photo" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" role="img" aria-label="Иллюстрация: дорога в горах Кавказа">
       <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b3a67"/><stop offset=".55" stop-color="#f08a5d"/><stop offset="1" stop-color="#ffd6a5"/></linearGradient></defs>
-      <rect width="1600" height="900" fill="url(#sky)"/><circle cx="1150" cy="470" r="70" fill="#ffe8c7"/>
-      <path d="M0 560 260 300 430 460 640 230 900 520 1120 330 1360 520 1600 380V900H0Z" fill="#3c4a72"/>
-      <path d="M560 300 640 230 720 300 680 290 640 320 600 290Z M1060 380 1120 330 1180 380 1150 372 1120 392 1090 372Z" fill="#eef4ff"/>
-      <path d="M0 660 380 520 700 610 1050 500 1600 640V900H0Z" fill="#26304f"/>
-      <path d="M700 900 790 610 830 610 1000 900Z" fill="#1a2038"/><path d="M806 640v30M808 700v45M811 780v60" stroke="#ffd6a5" stroke-width="6"/>
+      <rect width="1600" height="900" fill="url(#sky)"/><circle class="px" data-d="0.55" cx="1150" cy="470" r="70" fill="#ffe8c7"/>
+      <g class="px" data-d="0.45"><path d="M0 560 260 300 430 460 640 230 900 520 1120 330 1360 520 1600 380V1100H0Z" fill="#3c4a72"/>
+      <path d="M560 300 640 230 720 300 680 290 640 320 600 290Z M1060 380 1120 330 1180 380 1150 372 1120 392 1090 372Z" fill="#eef4ff"/></g>
+      <g class="px" data-d="0.28"><path d="M0 660 380 520 700 610 1050 500 1600 640V1100H0Z" fill="#26304f"/></g>
+      <g class="px" data-d="0.1"><path d="M700 1100 790 610 830 610 1060 1100Z" fill="#1a2038"/><path d="M806 640v30M808 700v45M811 780v60M815 870v70" stroke="#ffd6a5" stroke-width="6"/>
       <g fill="#10142a"><circle cx="1010" cy="700" r="16"/><rect x="996" y="716" width="28" height="70" rx="10"/><rect x="980" y="722" width="22" height="44" rx="8" fill="#ff5a1f"/><path d="M1022 730l34-30 6 7-32 32Z"/>
-      <circle cx="1080" cy="705" r="15"/><rect x="1067" y="720" width="26" height="66" rx="10"/><rect x="1088" y="726" width="20" height="42" rx="8" fill="#ff5a1f"/></g>
+      <circle cx="1080" cy="705" r="15"/><rect x="1067" y="720" width="26" height="66" rx="10"/><rect x="1088" y="726" width="20" height="42" rx="8" fill="#ff5a1f"/></g></g>
     </svg>`;
 $("helloText").textContent = DATA.helloText;
+$("helloDraft").innerHTML = DATA.helloDraft ? `<b>Черновик.</b> ${DATA.helloDraft}` : ""; $("helloDraft").hidden = !DATA.helloDraft;
 $("says").innerHTML = DATA.hello.some(h => h.say) ? DATA.hello.map(h => `<q>${h.say || ""}</q>`).join("") : "";
 $("duo").innerHTML = DATA.hello.map((h, i) => `<div class="person">
   <button class="circle" data-i="${i}" aria-label="Приветствие: ${h.name}. Включить звук">
     ${h.video ? `<video src="${h.video}" muted loop playsinline autoplay preload="metadata"></video>` : `<span class="play" aria-hidden="true">▶</span>`}
-    <span class="snd" aria-hidden="true">🔇</span></button>${h.name}</div>`).join("");
+    <span class="snd glass" aria-hidden="true">🔇</span></button>${h.name}</div>`).join("");
 // клик — включить звук у этого кружка и с начала, у другого выключить; кольцо = прогресс видео
 $("duo").querySelectorAll(".circle").forEach(btn => {
   const v = btn.querySelector("video"), snd = btn.querySelector(".snd");
@@ -723,8 +837,13 @@ $("duo").querySelectorAll(".circle").forEach(btn => {
 });
 $("footNow").textContent = DATA.nowPlace;
 // льдины: размеры и скорость случайные, но стабильные между перезагрузками
-$("floes").innerHTML = [[90,26,0],[160,34,-9],[60,20,-17],[220,40,-26],[110,28,-34],[70,22,-41]].map(([w,h,d], i) =>
-  `<i class="floe" style="width:${w}px;height:${h}px;animation-duration:${44 + i*7}s;animation-delay:${d}s;--x:${8 + i*15}%"></i>`).join("");
+$("mission").innerHTML = DATA.mission.quotes.map(q => `<figure><blockquote>${q.text}</blockquote><figcaption>${q.who}</figcaption></figure>`).join("");
+$("missionDraft").innerHTML = DATA.mission.draft ? "<b>Черновик.</b> Это временные слова — Семён и Рустам заменят их своими." : ""; $("missionDraft").hidden = !DATA.mission.draft;
+// кнопка «Наверх» появляется, когда первый экран пролистан
+addEventListener("scroll", () => $("toTop").classList.toggle("show", scrollY > innerHeight * 1.2), {passive: true});
+// размеры льдин в vw: крупные на любом экране, но только касаются низа букв
+$("floes").innerHTML = [[13,3.2,0],[22,4.2,-9],[9,2.6,-17],[28,4.8,-26],[15,3.6,-34],[11,3,-41]].map(([w,h,d], i) =>
+  `<i class="floe" style="width:${w}vw;height:${h}vw;animation-duration:${44 + i*7}s;animation-delay:${d}s;--x:${8 + i*15}%"></i>`).join("");
 const A = DATA.audience.filter(a => a.n);
 const total = A.reduce((t, a) => t + a.n, 0);
 const short = n => n >= 1e5 ? Math.floor(n / 1e3) + " тыс." : fmt(n);
@@ -759,5 +878,70 @@ const showPc = k => {
 };
 document.querySelectorAll(".chip[data-pc]").forEach(b => b.onclick = () => showPc(b.dataset.pc));
 showPc("road");
+// ===== эффекты прокрутки (выключены, если человек просил браузер не анимировать) =====
+if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  document.documentElement.classList.add("fx");
+  const secs = [...document.querySelectorAll("main > section")];
+  const navH = () => document.querySelector(".nav").offsetHeight;
+  // карта замирает на ~2 экрана прокрутки, пока рисуется маршрут
+  const routeSec = $("route"), routeIn = routeSec.querySelector(".in");
+  const stages = [{f: 0, t: "Старт · Москва", d: DATA.track[0] && new Date(DATA.track[0].date)}].concat(
+    [...DATA.days].reverse().filter(d => d.type === "road" || d.type === "fail")
+      .map(d => ({f: d.type === "fail" ? routeFrac("Тбилиси") + 0.002 : routeFrac(d.to), t: `День ${d.n} · ${d.title}`, d: new Date(d.date), photo: d.photo})))
+    .sort((a, b) => a.f - b.f);
+  let lastStage = -1;
+  const routeTick = () => {
+    const r = routeSec.getBoundingClientRect(), pad = parseFloat(getComputedStyle(routeSec).paddingTop);
+    const travel = routeSec.offsetHeight - routeIn.offsetHeight - 2 * pad;
+    const p = Math.max(0, Math.min(1, (navH() - r.top - pad) / travel));
+    routeScrub && routeScrub(p);
+    let k = 0; stages.forEach((st, i) => { if (st.f <= p + 1e-6) k = i; });
+    if (k !== lastStage) { lastStage = k; const st = stages[k];
+      $("stage").innerHTML = (st.photo ? `<img src="${st.photo}" alt="">` : "") + `<div><b>${st.d ? st.d.toLocaleDateString("ru-RU", {day:"numeric", month:"long"}) : ""}</b>${st.t}</div>`; }
+  };
+  // 1. секция прилипает, когда её низ доходит до низа экрана (короткая — сразу под шапкой)
+  const place = () => secs.forEach((el, i) => {
+    if (el === routeSec) { routeIn.style.top = navH() + "px"; el.style.minHeight = (routeIn.offsetHeight + innerHeight * 2.2) + "px"; }
+    el.style.zIndex = i + 1;
+    el.style.top = (i === secs.length - 1 ? "auto" : Math.min(navH(), innerHeight - el.offsetHeight) + "px");
+    if (i === secs.length - 1) el.style.position = "relative";
+  });
+  // 4. параллакс гор: дальние слои сдвигаются медленнее ближних
+  const layers = [...document.querySelectorAll(".photo .px")];
+  const tick = () => {
+    secs.forEach((el, i) => {
+      const next = secs[i + 1];
+      const p = next ? Math.min(1, Math.max(0, 1 - next.getBoundingClientRect().top / innerHeight)) : 0;
+      el.style.setProperty("--p", p.toFixed(3));
+    });
+    routeTick();
+    // параллакс: слой отстаёт от прокрутки на долю d (дальние — сильнее), пока первый экран на виду
+    const ph = document.querySelector(".photo");
+    if (ph) { const u = 1600 / ph.getBoundingClientRect().width, y = Math.min(scrollY, secs[0].offsetHeight + innerHeight);
+      layers.forEach(g => g.setAttribute("transform", `translate(0 ${(y * u * g.dataset.d * .35).toFixed(1)})`)); }
+  };
+  let raf = 0;
+  addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; tick(); }); }, {passive: true});
+  addEventListener("resize", () => { place(); tick(); });
+  place(); tick();
+
+  const once = (el, fn, threshold = .35) => { const io = new IntersectionObserver(es => { if (es[0].isIntersecting) { io.disconnect(); fn(); } }, {threshold}); io.observe(el); };
+  // 5. числа отсчитываются с нуля, полоски заполняются
+  const countUp = el => {
+    const tn = [...el.childNodes].find(n => n.nodeType === 3 && /\d/.test(n.textContent));
+    if (!tn) return;
+    const full = tn.textContent, m = full.match(/\d[\d\s\u00a0]*/), target = +m[0].replace(/\D/g, "");
+    const pad = m[0].endsWith(" ") ? " " : "";
+    tn.textContent = full.replace(m[0], "0" + pad);
+    return () => { const t0 = performance.now(), dur = 2200;
+    const step = t => { const q = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - q, 3);
+      tn.textContent = full.replace(m[0], fmt(Math.round(target * e)) + pad); if (q < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step); };
+  };
+  ["done", "audTotal", "raised"].forEach(id => { const run = $(id) && countUp($(id)); if (run) once($(id), run, .8); });
+  document.querySelectorAll(".bar").forEach(b => { b.classList.add("wait"); once(b, () => b.classList.remove("wait"), .6); });
+  // заголовки проявляются
+  document.querySelectorAll(".head").forEach(h => once(h, () => h.classList.add("seen"), .5));
+}
 $("links").innerHTML = DATA.links.map(l => `<a href="${l.url}" target="_blank" rel="noopener">${l.name}</a>`).join("");
 </script>
