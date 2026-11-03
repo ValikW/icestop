@@ -48,11 +48,15 @@ main>section.alt{background:var(--alt)}
 /* закреплённая карта целиком помещается в окно вместе с заголовком, плашка этапа всегда видна */
 .fx #route .map svg{max-height:max(300px,calc(100svh - 250px))}
 .stage{position:absolute;left:14px;bottom:14px;right:74px;max-width:420px;padding:12px 16px;border-radius:18px;font-size:15px;line-height:1.35}
-.stage{display:flex;gap:12px;align-items:center}
-.stage img{width:64px;height:64px;flex-shrink:0;object-fit:cover;border-radius:12px}
+.stage{display:flex;flex-direction:column;gap:10px;width:min(320px,calc(100% - 100px));max-width:none;right:auto;padding:14px;border-radius:24px}
+.stage>*{animation:stageIn .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes stageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.stage img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:16px}
+.stage div{padding:2px 4px 0}
 .stage b{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:2px}
 .stage:empty{display:none}
-@media (max-width:640px){.stage{position:static;max-width:none;margin:10px;box-shadow:none}}
+@media (max-width:640px){.stage{position:static;width:auto;margin:10px;box-shadow:none;flex-direction:row;align-items:center;font-size:14px}
+  .stage img{order:-1;width:92px;height:92px;flex-shrink:0;aspect-ratio:1;border-radius:14px}}
 .map .head-dot{fill:#fff;stroke:var(--accent);stroke-width:3;vector-effect:non-scaling-stroke}
 /* Liquid Glass: полупрозрачное стекло с размытием, бликом по верхнему краю и мягкой тенью */
 .glass{background:color-mix(in srgb,var(--tile) 55%,transparent);backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);
@@ -544,22 +548,22 @@ const DATA = {
   // временная пометка для ребят под заголовком дневника; пусто — не показывается
   diaryDraft:"Заметка для Семёна и Рустама: дневник собран автоматически из ваших постов в Telegram. Сделано быстро, поэтому взяты только ключевые куски. Дальше всё будет само: любой кружочек, голосовое или текст в Telegram превратится в заметку здесь. Настраивается быстро.",
   // временная пометка для ребят под картой; пусто — не показывается
-  mapDraft:"Для Семёна и Рустама: пока листаешь карту, внизу появляются заметки по дням. К каждой можно добавить фото этого дня — поле photo у записи в дневнике, и оно встанет рядом с текстом. Так будет живее.",
+  mapDraft:"Для Семёна и Рустама: пока листаешь карту, на ней появляются заметки по дням с фото из вашего Telegram за этот день. Сейчас фото подобраны вручную, дальше бот будет брать их из постов сам.",
   // дни: type photo — необязательная ссылка на фото дня, показывается в плашке этапа на карте road | sea | rest
   days: [
-    {n:44, date:"2026-11-02", type:"road", title:"Ирак! Первый же водитель дал денег и посадил в такси", from:"Батман", to:"Захо", km:229},
+    {n:44, date:"2026-11-02", type:"road", title:"Ирак! Первый же водитель дал денег и посадил в такси", from:"Батман", to:"Захо", km:229, photo:"media/days/2026-11-02.jpg"},
     {n:43, date:"2026-11-01", type:"road", title:"Через всю Турцию к иракской границе", from:"Батуми", to:"Батман", km:645},
-    {n:41, date:"2026-10-30", type:"rest", title:"Батуми: талантливые хозяева, классический автостоп и мечта о Вавилоне", from:"Батуми"},
-    {n:40, date:"2026-10-29", type:"road", title:"Ночь на трассе в часе от Батуми: темно, машинам негде остановиться", from:"Тбилиси", to:"Батуми", km:364},
-    {n:36, date:"2026-10-25", type:"fail", title:"Армения: три часа допросов на границе и отказ во въезде", from:"Тбилиси", to:"граница Армении и обратно"},
-    {n:26, date:"2026-10-15", type:"rest", title:"ЧП: айфон оператора упал в деревенский туалет", from:"Тбилиси"},
-    {n:25, date:"2026-10-14", type:"rest", title:"На дорогу до Антарктиды осталось 100 $ — зарабатываем в пути", from:"Тбилиси"},
-    {n:18, date:"2026-10-07", type:"rest", title:"Интервью в газете московского метро — сразу после Овечкина", from:"Тбилиси"},
-    {n:16, date:"2026-10-05", type:"road", title:"Очередь на Верхнем Ларсе и первая ночь на окраине Тбилиси", from:"Владикавказ", to:"Тбилиси", km:200},
-    {n:14, date:"2026-10-03", type:"road", title:"Ночью в Кочубее, Дагестан", from:"Элиста", to:"Кочубей", km:336},
-    {n:12, date:"2026-10-01", type:"road", title:"Сталинград. Ночлег у друга, который подвозил Семёна 6 лет назад", from:"Саратов", to:"Волгоград", km:377},
-    {n:11, date:"2026-09-30", type:"road", title:"Почти 500 км за день и тёплая однушка подписчика в Саратове", from:"Самарская Лука", to:"Саратов", km:397},
-    {n:4, date:"2026-09-23", type:"road", title:"Тольятти всегда радует закатами", from:"Рязань", to:"Тольятти", km:808},
+    {n:41, date:"2026-10-30", type:"rest", title:"Батуми: талантливые хозяева, классический автостоп и мечта о Вавилоне", from:"Батуми", photo:"media/days/2026-10-30.jpg"},
+    {n:40, date:"2026-10-29", type:"road", title:"Ночь на трассе в часе от Батуми: темно, машинам негде остановиться", from:"Тбилиси", to:"Батуми", km:364, photo:"media/days/2026-10-29.jpg"},
+    {n:36, date:"2026-10-25", type:"fail", title:"Армения: три часа допросов на границе и отказ во въезде", from:"Тбилиси", to:"граница Армении и обратно", photo:"media/days/2026-10-25.jpg"},
+    {n:26, date:"2026-10-15", type:"rest", title:"ЧП: айфон оператора упал в деревенский туалет", from:"Тбилиси", photo:"media/days/2026-10-15.jpg"},
+    {n:25, date:"2026-10-14", type:"rest", title:"На дорогу до Антарктиды осталось 100 $ — зарабатываем в пути", from:"Тбилиси", photo:"media/days/2026-10-14.jpg"},
+    {n:18, date:"2026-10-07", type:"rest", title:"Интервью в газете московского метро — сразу после Овечкина", from:"Тбилиси", photo:"media/days/2026-10-07.jpg"},
+    {n:16, date:"2026-10-05", type:"road", title:"Очередь на Верхнем Ларсе и первая ночь на окраине Тбилиси", from:"Владикавказ", to:"Тбилиси", km:200, photo:"media/days/2026-10-05.jpg"},
+    {n:14, date:"2026-10-03", type:"road", title:"Ночью в Кочубее, Дагестан", from:"Элиста", to:"Кочубей", km:336, photo:"media/days/2026-10-03.jpg"},
+    {n:12, date:"2026-10-01", type:"road", title:"Сталинград. Ночлег у друга, который подвозил Семёна 6 лет назад", from:"Саратов", to:"Волгоград", km:377, photo:"media/days/2026-10-01.jpg"},
+    {n:11, date:"2026-09-30", type:"road", title:"Почти 500 км за день и тёплая однушка подписчика в Саратове", from:"Самарская Лука", to:"Саратов", km:397, photo:"media/days/2026-09-30.jpg"},
+    {n:4, date:"2026-09-23", type:"road", title:"Тольятти всегда радует закатами", from:"Рязань", to:"Тольятти", km:808, photo:"media/days/2026-09-23.jpg"},
     {n:2, date:"2026-09-21", type:"road", title:"Старт. Первая остановка — Рязань", from:"Москва", to:"Рязань", km:198},
   ],
 
@@ -891,6 +895,7 @@ if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
     [...DATA.days].reverse().filter(d => d.type === "road" || d.type === "fail")
       .map(d => ({f: d.type === "fail" ? routeFrac("Тбилиси") + 0.002 : routeFrac(d.to), t: `День ${d.n} · ${d.title}`, d: new Date(d.date), photo: d.photo})))
     .sort((a, b) => a.f - b.f);
+  stages.forEach(st => { if (st.photo) new Image().src = st.photo; });
   let lastStage = -1;
   const routeTick = () => {
     const r = routeSec.getBoundingClientRect(), pad = parseFloat(getComputedStyle(routeSec).paddingTop);
@@ -899,7 +904,7 @@ if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
     routeScrub && routeScrub(p);
     let k = 0; stages.forEach((st, i) => { if (st.f <= p + 1e-6) k = i; });
     if (k !== lastStage) { lastStage = k; const st = stages[k];
-      $("stage").innerHTML = (st.photo ? `<img src="${st.photo}" alt="">` : "") + `<div><b>${st.d ? st.d.toLocaleDateString("ru-RU", {day:"numeric", month:"long"}) : ""}</b>${st.t}</div>`; }
+      $("stage").innerHTML = `<div><b>${st.d ? st.d.toLocaleDateString("ru-RU", {day:"numeric", month:"long"}) : ""}</b>${st.t}</div>` + (st.photo ? `<img src="${st.photo}" alt="Фото этого дня из Telegram">` : ""); }
   };
   // 1. секция прилипает, когда её низ доходит до низа экрана (короткая — сразу под шапкой)
   const place = () => secs.forEach((el, i) => {
