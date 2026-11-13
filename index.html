@@ -54,13 +54,10 @@ main>section.alt{background:var(--alt)}
 .stage div{padding:2px 4px 0}
 .stage b{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:2px}
 .stage:empty{display:none}
-/* телефон: дни — карточки одной высоты под картой, листаются вбок */
-@media (max-width:640px){.stage{position:static;width:auto;flex-direction:row;gap:8px;padding:8px;margin:0;border:0;border-radius:0;background:none;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;
-    overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:8px;touch-action:pan-x;scrollbar-width:none;font-size:14px}
-  .stage::-webkit-scrollbar{display:none}
-  .stage .dcard{flex:0 0 86%;height:76px;box-sizing:border-box;scroll-snap-align:start;display:flex;align-items:center;gap:12px;padding:8px 8px 8px 14px;border-radius:16px;background:var(--tile)}
-  .stage .dcard div{padding:0;flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-  .stage .dcard img{width:60px;height:60px;flex-shrink:0;aspect-ratio:1;border-radius:12px}}
+/* телефон: плашка дня — стеклянная строка под картой (не закрывает путь): текст слева, квадратное фото справа */
+@media (max-width:640px){.stage{position:static;margin-top:10px;width:auto;min-height:92px;box-sizing:border-box;flex-direction:row;align-items:center;gap:10px;padding:8px;border-radius:18px;font-size:14px;line-height:1.3}
+  .stage div{flex:1;min-width:0;padding:0 0 0 6px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  .stage img{width:76px;height:76px;flex-shrink:0;aspect-ratio:1;border-radius:12px;order:2}}
 .map .head-dot{fill:#fff;stroke:var(--accent);stroke-width:3;vector-effect:non-scaling-stroke}
 /* Liquid Glass: полупрозрачное стекло с размытием, бликом по верхнему краю и мягкой тенью */
 .glass{background:color-mix(in srgb,var(--tile) 55%,transparent);backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);
@@ -107,7 +104,7 @@ a:hover{text-decoration:underline}
 .pic{position:relative}
 .shot{max-width:980px;margin:48px auto 0;text-align:left}
 .photo{display:block;width:100%;aspect-ratio:12/5;max-height:40vh;object-fit:cover;object-position:50% 100%;border-radius:28px;background:var(--alt)}
-.duo{position:absolute;left:0;right:0;bottom:-84px;display:flex;justify-content:space-between;padding-inline:32px}
+.duo{position:absolute;left:0;right:0;bottom:-84px;display:flex;justify-content:space-between;align-items:flex-end;padding-inline:32px}
 .says{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
 .says:empty{display:none}
 .says q{display:block;font-size:16px;line-height:1.4;color:var(--ink);quotes:"«" "»";max-width:32ch}
@@ -116,13 +113,15 @@ a:hover{text-decoration:underline}
 .person{display:grid;justify-items:center;gap:8px;font-size:15px;font-weight:600}
 .circle{position:relative;width:150px;height:150px;border-radius:50%;padding:5px;border:0;cursor:pointer;
   background:conic-gradient(var(--accent) calc(var(--p,1) * 100%),color-mix(in srgb,var(--accent) 25%,var(--bg)) 0);box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.circle{transition:width .45s cubic-bezier(.2,.8,.2,1),height .45s cubic-bezier(.2,.8,.2,1)}
+.person.on .circle{width:300px;height:300px}
 .circle .snd{position:absolute;right:8px;bottom:8px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-size:15px;border:3px solid var(--bg)}
 .circle>*{display:block;width:100%;height:100%;border-radius:50%;object-fit:cover;border:4px solid var(--bg);background:#1d1d1f}
 .circle .play{display:grid;place-items:center;color:#fff;font-size:34px;cursor:pointer}
 .note{padding:118px 0 0;text-align:center}
 .note .meta{font-size:14px;color:var(--muted)}
 .note p{margin:4px auto 0;font-size:19px;font-weight:600;line-height:1.35;max-width:40ch}
-@media (max-width:640px){.circle{width:112px;height:112px}.duo{bottom:-50px;padding-inline:12px}.note{padding:84px 0 0}.photo{border-radius:20px;aspect-ratio:2/1}}
+@media (max-width:640px){.circle{width:112px;height:112px}.person.on .circle{width:224px;height:224px}.duo{bottom:-50px;padding-inline:12px}.note{padding:84px 0 0}.photo{border-radius:20px;aspect-ratio:2/1}}
 .ctas{display:flex;justify-content:center;align-items:center;gap:28px;flex-wrap:wrap;margin-top:28px;font-size:19px}
 .chev::after{content:" ›"}
 
@@ -310,8 +309,6 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
   .fx main>section::after{display:none}
   .fx main>section+section{border-radius:0;box-shadow:none}
   .fx .hero{padding-bottom:40px}
-  .fx #route .in{position:static}
-  .fx #route .map svg{max-height:none}
   /* кнопки карты меньше, но попасть пальцем так же легко */
   .map-ctl{top:8px;right:8px;gap:6px}
   .map-ctl button{position:relative;width:34px;height:34px;font-size:18px}
@@ -920,8 +917,10 @@ function typeSay(i) {
   requestAnimationFrame(tick);
 }
 vids.forEach((v, i) => {
-  v.onplay = () => typeSay(i);
-  v.onended = () => { const n = vids[i + 1]; if (n) { n.muted = v.muted; if (!v.muted) { const sn = n.closest(".circle").querySelector(".snd"); sn.textContent = "🔊"; sn.dataset.on = ""; } n.currentTime = 0; n.play().catch(() => {}); } };
+  const big = () => v.closest(".person").classList.toggle("on", !v.muted && !v.paused && !v.ended);
+  v.onpause = v.onvolumechange = big;
+  v.onplay = () => { typeSay(i); big(); };
+  v.onended = () => { big(); const n = vids[i + 1]; if (n) { n.muted = v.muted; if (!v.muted) { const sn = n.closest(".circle").querySelector(".snd"); sn.textContent = "🔊"; sn.dataset.on = ""; } n.currentTime = 0; n.play().catch(() => {}); } };
 });
 $("duo").querySelectorAll(".circle").forEach(btn => {
   const v = btn.querySelector("video"), snd = btn.querySelector(".snd");
@@ -998,23 +997,10 @@ addEventListener("DOMContentLoaded", () => {
     [...DATA.days].reverse().filter(d => d.type === "road" || d.type === "fail")
       .map(d => ({f: d.type === "fail" ? routeFrac("Тбилиси") + 0.002 : routeFrac(d.to), t: `День ${d.n} · ${d.title}`, d: new Date(d.date), photo: d.photo})))
     .sort((a, b) => a.f - b.f);
-  if (!phone) stages.forEach(st => { if (st.photo) new Image().src = st.photo; });
+  stages.forEach(st => { if (st.photo) new Image().src = st.photo; });
   const dDate = st => st.d ? st.d.toLocaleDateString("ru-RU", {day:"numeric", month:"long"}) : "";
-  if (phone) {
-    // карточки дней листаются вбок, карта дорисовывает путь до выбранного дня; открыто на последнем
-    const box = $("stage"); box.removeAttribute("aria-live");
-    box.innerHTML = stages.map(st => `<div class="dcard"><div><b>${dDate(st)}</b>${st.t}</div>` + (st.photo ? `<img src="${st.photo}" alt="" loading="lazy">` : "") + `</div>`).join("");
-    box.scrollLeft = box.scrollWidth; routeScrub && routeScrub(1);
-    let cur = stages.length - 1;
-    box.addEventListener("scroll", () => {
-      const max = box.scrollWidth - box.clientWidth, step = box.children[1] ? box.children[1].offsetLeft - box.children[0].offsetLeft : 1;
-      const k = box.scrollLeft >= max - 2 ? stages.length - 1 : Math.min(stages.length - 1, Math.round(box.scrollLeft / step));
-      if (k !== cur) { cur = k; routeScrub && routeScrub(k === stages.length - 1 ? 1 : stages[k].f); }
-    }, {passive: true});
-  }
   let lastStage = -1;
   const routeTick = () => {
-    if (phone) return;
     const r = routeSec.getBoundingClientRect(), pad = parseFloat(getComputedStyle(routeSec).paddingTop);
     const travel = routeSec.offsetHeight - routeIn.offsetHeight - 2 * pad;
     const p = Math.max(0, Math.min(1, (navH() - r.top - pad) / travel));
@@ -1024,8 +1010,9 @@ addEventListener("DOMContentLoaded", () => {
       $("stage").innerHTML = `<div><b>${dDate(st)}</b>${st.t}</div>` + (st.photo ? `<img src="${st.photo}" alt="Фото этого дня из Telegram">` : ""); }
   };
   // 1. секция прилипает, когда её низ доходит до низа экрана (короткая — сразу под шапкой)
-  const place = () => !phone && secs.forEach((el, i) => {
+  const place = () => secs.forEach((el, i) => {
     if (el === routeSec) { routeIn.style.top = navH() + "px"; el.style.minHeight = (routeIn.offsetHeight + innerHeight * 2.2) + "px"; }
+    if (phone) return; // на телефоне секции идут одна за другой, залипает только карта
     el.style.zIndex = i + 1;
     el.style.top = (i === secs.length - 1 ? "auto" : Math.min(navH(), innerHeight - el.offsetHeight) + "px");
     if (i === secs.length - 1) el.style.position = "relative";
