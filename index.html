@@ -217,6 +217,30 @@ section:not(.alt) .t{background:var(--alt)}
 .day .km{font-size:17px;font-weight:600;text-align:right;white-space:nowrap}
 .day .km span{display:block;font-size:13px;font-weight:400;color:var(--muted)}
 .day .km:empty{display:none}
+/* дневник из ленты Telegram: день = главное событие + остальные записи под «ещё» */
+.fday{padding:26px 0;border-bottom:1px solid var(--line)}
+.fday:first-child{border-top:1px solid var(--line)}
+.fday .dh{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.fday .dh .num{font-size:32px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.fday .dh span{font-size:14px;color:var(--muted)}
+.fpost{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start}
+.fpost .who{font-size:13px;color:var(--muted);margin-bottom:4px}
+.fpost h3{font-size:19px;line-height:1.3;margin:0 0 6px}
+.fpost p{margin:0;font-size:16px;line-height:1.45;color:var(--ink);white-space:pre-line}
+.fpost a.tg{font-size:14px}
+.fmedia{width:132px}
+.fmedia img{display:block;width:132px;height:132px;object-fit:cover;border-radius:16px;background:var(--tile)}
+.fmedia .rv{position:relative;display:block;width:132px;height:132px;padding:0;border:0;border-radius:50%;overflow:hidden;cursor:pointer;background:var(--tile)}
+.fmedia .rv video{width:100%;height:100%;object-fit:cover}
+.fmedia .rv::after{content:"▶";position:absolute;inset:auto 8px 8px auto;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-size:13px}
+.fmedia .rv.on::after{content:"❚❚";font-size:10px}
+.fpost.nomedia{grid-template-columns:1fr}
+.fmore{margin-top:14px}
+.fmore summary{cursor:pointer;color:var(--link);font-size:15px;min-height:44px;display:flex;align-items:center}
+.fmore .fpost{margin-top:14px}
+.fmore .fmedia,.fmore .fmedia img,.fmore .fmedia .rv{width:84px;height:84px}
+.fmore p{font-size:15px;color:var(--muted)}
+@media (max-width:520px){.fmedia,.fmedia img,.fmedia .rv{width:88px;height:88px}.fpost{gap:12px}.fpost h3{font-size:17px}.fpost p{font-size:15px}}
 .tag{font-size:13px;font-weight:400;color:var(--muted);margin-left:8px}
 .empty{padding:22px 0;color:var(--muted);text-align:center}
 @media (max-width:520px){.day{grid-template-columns:52px 1fr}.day .d{font-size:26px}.day .km{grid-column:2;text-align:left}.day .km span{display:inline;margin-left:8px}}
@@ -430,13 +454,13 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
   <section id="diary">
     <div class="in">
       <div class="head"><h2>Дневник.</h2><p class="num" id="dayCount"></p><div><p class="draft" id="diaryDraft"></p></div></div>
-      <div class="seg-ctl"><div class="glass" role="group" aria-label="Фильтр дней">
+      <div class="seg-ctl" id="diaryFilter" style="display:none"><div class="glass" role="group" aria-label="Чьи записи">
         <button class="chip" data-f="all" aria-pressed="true">Все</button>
-        <button class="chip" data-f="road" aria-pressed="false">Трасса</button>
-        <button class="chip" data-f="sea" aria-pressed="false">По воде</button>
-        <button class="chip" data-f="rest" aria-pressed="false">Стоянки</button>
+        <button class="chip" data-f="Семён" aria-pressed="false">Семён</button>
+        <button class="chip" data-f="Рустам" aria-pressed="false">Рустам</button>
       </div></div>
       <ul class="days" id="days" aria-live="polite"></ul>
+      <div class="ctas"><button class="pill glass-pill" id="moreDays" hidden>Показать ещё</button></div>
     </div>
   </section>
 
@@ -745,11 +769,63 @@ function renderDays(f) {
     return `<li class="day"><div class="d num">${d.n}<span>${dt}</span></div><div><h3>${d.title}${tag}</h3><p>${path}</p></div><div class="km num">${km}</div></li>`;
   }).join("");
 }
-document.querySelectorAll(".chip[data-f]").forEach(b => b.onclick = () => {
-  document.querySelectorAll(".chip[data-f]").forEach(x => x.setAttribute("aria-pressed", x === b));
-  renderDays(b.dataset.f);
-});
 renderDays("all");
+// ===== лента из Telegram (сборщик на сервере): если загрузилась — дневник и плашки на карте берутся из неё =====
+const FEED = "https://ice-stop.ru/feed/";
+const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const clip = (t, n) => { t = String(t || "").replace(/\s+/g, " ").trim(); return t.length > n ? t.slice(0, n).replace(/\s\S*$/, "") + "…" : t; };
+let feedDays = null, diaryShown = 7, diaryWho = "all";
+const placeOn = day => { let pl = ""; DATA.track.forEach(t => { if (t.date <= day) pl = t.place.split(" · ").pop(); }); return pl; };
+const postBody = p => p.title || p.text || p.transcript || "";
+const postHTML = (p, main) => {
+  const m = p.kind === "circle" || p.kind === "video" ? `<button class="rv" aria-label="Смотреть: ${p.author}"><video src="${FEED + p.media}" poster="${p.poster ? FEED + p.poster : ""}" preload="none" playsinline></video></button>`
+    : p.kind === "photo" && p.media ? `<img src="${FEED + p.media}" alt="" loading="lazy">` : "";
+  const txt = p.text || p.transcript || "";
+  return `<div class="fpost${m ? "" : " nomedia"}">${m ? `<div class="fmedia">${m}</div>` : ""}<div><div class="who">${p.author}${p.kind === "circle" ? " · кружочек" : p.kind === "voice" ? " · голосовое" : ""}</div>` +
+    (main && p.title ? `<h3>${esc(p.title)}</h3>` : "") + `<p>${esc(main ? clip(txt, 280) : clip(txt, 200))}</p> <a class="tg" href="${p.url}" target="_blank" rel="noopener">в Telegram ›</a></div></div>`;
+};
+function renderFeed() {
+  const list = feedDays.filter(d => diaryWho === "all" || d.posts.some(p => p.author === diaryWho));
+  const n = list.reduce((t, d) => t + d.posts.filter(p => diaryWho === "all" || p.author === diaryWho).length, 0);
+  const pl = (k, a, b, c) => k % 10 === 1 && k % 100 !== 11 ? a : k % 10 >= 2 && k % 10 <= 4 && (k % 100 < 10 || k % 100 >= 20) ? b : c;
+  $("dayCount").textContent = `${list.length} ${pl(list.length, "день", "дня", "дней")} · ${n} ${pl(n, "запись", "записи", "записей")} из Telegram`;
+  $("days").innerHTML = list.slice(0, diaryShown).map(d => {
+    const ps = d.posts.filter(p => diaryWho === "all" || p.author === diaryWho);
+    const main = ps.find(p => p.id === d.main) || ps[0], rest = ps.filter(p => p !== main);
+    const dn = Math.floor((new Date(d.day) - new Date(DATA.startDate)) / dayMs) + 1;
+    return `<li class="fday"><div class="dh"><b class="num">${dn}</b><span>${new Date(d.day).toLocaleDateString("ru-RU", {weekday:"short", day:"numeric", month:"long"})}${d.place ? " · " + d.place : ""}</span></div>` +
+      postHTML(main, true) + (rest.length ? `<details class="fmore"><summary>Ещё ${rest.length} за этот день</summary>${rest.map(p => postHTML(p, false)).join("")}</details>` : "") + `</li>`;
+  }).join("");
+  $("moreDays").hidden = list.length <= diaryShown;
+}
+$("moreDays").onclick = () => { diaryShown += 7; renderFeed(); };
+// кружочек в дневнике: нажал — играет со звуком, нажал ещё — пауза; другие останавливаются
+$("days").addEventListener("click", e => {
+  const b = e.target.closest(".rv"); if (!b) return;
+  const v = b.querySelector("video");
+  document.querySelectorAll("#days video").forEach(o => { if (o !== v) { o.pause(); o.parentNode.classList.remove("on"); } });
+  if (v.paused) { v.play(); b.classList.add("on"); } else { v.pause(); b.classList.remove("on"); }
+  v.onended = () => b.classList.remove("on");
+});
+const feedReady = fetch(FEED + "feed.json", {cache: "no-cache"}).then(r => r.json()).then(F => {
+  const posts = F.posts.filter(p => !p.hide && !/ pinned «/.test(p.text || ""));
+  const by = {};
+  posts.forEach(p => (by[p.day] = by[p.day] || []).push(p));
+  feedDays = Object.keys(by).sort().reverse().map(day => {
+    const ps = by[day].sort((a, b) => a.date < b.date ? -1 : 1), main = (F.days[day] || {}).main;
+    const old = DATA.days.find(d => d.date === day); // заголовок дня, если его писали руками
+    return {day, posts: ps, main: ps.some(p => p.id === main) ? main : ps[0].id, place: placeOn(day), title: old && old.title};
+  });
+  feedDays.forEach(d => { const m = d.posts.find(p => p.id === d.main); if (d.title && m && !m.title) m.title = d.title; });
+  document.querySelectorAll(".chip[data-f]").forEach(b => b.onclick = () => {
+    document.querySelectorAll(".chip[data-f]").forEach(x => x.setAttribute("aria-pressed", x === b));
+    diaryWho = b.dataset.f; diaryShown = 7; renderFeed();
+  });
+  document.querySelectorAll('.chip[data-f]').forEach(x => x.setAttribute("aria-pressed", x.dataset.f === "all"));
+  $("diaryFilter").style.display = ""; renderFeed();
+  $("updated").textContent = new Date(posts[0] ? posts.map(p => p.date).sort().pop() : Date.now()).toLocaleDateString("ru-RU", {day:"numeric", month:"long"});
+  return feedDays;
+}).catch(() => null); // ленты нет — остаётся дневник из DATA.days
 $("mapDraft").innerHTML = DATA.mapDraft ? `<b>Черновик.</b> ${DATA.mapDraft}` : ""; $("mapDraft").hidden = !DATA.mapDraft;
 $("diaryDraft").innerHTML = DATA.diaryDraft ? `<b>Черновик.</b> ${DATA.diaryDraft}` : ""; $("diaryDraft").hidden = !DATA.diaryDraft;
 
@@ -772,7 +848,7 @@ $("pay").onclick = e => {
     () => { b.textContent = "Скопировано"; setTimeout(() => b.textContent = "Скопировать", 1500); },
     () => getSelection().selectAllChildren(code));
 };
-var routeScrub, routeFrac; // заполняет drawMap
+var routeScrub, routeFrac, routeFracDay; // заполняет drawMap
 // телефон: секции без наезда, карта без залипания, дни — карточками (ponytail: проверяется один раз при загрузке, поворот экрана не перестраивает)
 const phone = matchMedia("(max-width:640px)").matches;
 // partners.html — та же страница, только аудитория и предложения брендам; ссылки меню ведут на главную
@@ -918,7 +994,12 @@ function drawMap() {
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const fly = t => svg.interrupt().transition().duration(still ? 0 : 1400).ease(d3.easeCubicInOut).call(zoom.transform, t);
   $("zme").onclick = () => fly(closeUp);
-  routeScrub = scrub; routeFrac = fracOf;
+  const fracDay = day => { const T = DATA.track || [], L = legStart.at(-1) || 1; let i = -1;
+    T.forEach((t, k) => { if (t.date <= day) i = k; });
+    if (i < 0) return 0; if (i >= T.length - 1 || legStart[i + 1] === undefined) return 1;
+    const a = new Date(T[i].date), b = new Date(T[i + 1].date), q = b > a ? Math.min(1, (new Date(day) - a) / (b - a)) : 0;
+    return (legStart[i] + q * (legStart[i + 1] - legStart[i])) / L; };
+  routeScrub = scrub; routeFrac = fracOf; routeFracDay = fracDay;
   // с эффектами прокрутки карта сразу показывает весь пройденный путь крупно, чтобы было видно, как он рисуется
   if (!still) {
     const all = [...(DATA.track || []).map(t => proj(ll(t.coords))), [mx, my], ...(next ? [proj(ll(next.ll))] : [])];
@@ -1134,11 +1215,18 @@ addEventListener("DOMContentLoaded", () => {
   const navH = () => document.querySelector(".nav").offsetHeight;
   // карта замирает на ~2 экрана прокрутки, пока рисуется маршрут
   const routeSec = $("route"), routeIn = routeSec.querySelector(".in");
-  const stages = [{f: 0, t: "Старт · Москва", d: DATA.track[0] && new Date(DATA.track[0].date)}].concat(
+  let stages = [{f: 0, t: "Старт · Москва", d: DATA.track[0] && new Date(DATA.track[0].date)}].concat(
     [...DATA.days].reverse().filter(d => d.type === "road" || d.type === "fail")
       .map(d => ({f: d.type === "fail" ? routeFrac("Тбилиси") + 0.002 : routeFrac(d.to), t: `День ${d.n} · ${d.title}`, d: new Date(d.date), photo: d.photo})))
     .sort((a, b) => a.f - b.f);
   stages.forEach(st => { if (st.photo) new Image().src = st.photo; });
+  feedReady.then(fd => { if (!fd || !routeFracDay) return;
+    stages = fd.slice().reverse().map(d => { const m = d.posts.find(p => p.id === d.main) || d.posts[0];
+      const dn = Math.floor((new Date(d.day) - new Date(DATA.startDate)) / dayMs) + 1;
+      return {f: routeFracDay(d.day), t: `День ${dn}${d.place ? " · " + d.place : ""} · ${esc(clip(d.title || m.title || m.text || m.transcript, 110))}`, d: new Date(d.day),
+        photo: m.kind === "photo" ? FEED + m.media : m.poster ? FEED + m.poster : (d.posts.find(p => p.kind === "photo") ? FEED + d.posts.find(p => p.kind === "photo").media : "")}; })
+      .sort((a, b) => a.f - b.f || a.d - b.d);
+    lastStage = -1; routeTick(); });
   const dDate = st => st.d ? st.d.toLocaleDateString("ru-RU", {day:"numeric", month:"long"}) : "";
   let lastStage = -1;
   const routeTick = () => {
