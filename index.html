@@ -312,6 +312,16 @@ footer{position:sticky;bottom:0;z-index:0;overflow:hidden;padding-block:40px 0;b
 .floe{position:absolute;bottom:-14px;left:var(--x);background:var(--ice);border-radius:40% 55% 10% 12% / 60% 50% 8% 8%;opacity:.95}
 @media (prefers-reduced-motion:no-preference){.floe{left:0;animation:drift linear infinite}}
 @keyframes drift{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
+/* мини-игра в подвале: бегун по льдинам, одна кнопка — прыжок */
+.glass-pill{background:var(--tile);color:var(--ink)}
+.gbar{position:relative;z-index:3;text-align:center;padding:18px 16px 28px}
+footer.playing .floes,footer.playing .gbar{display:none}
+.game{position:relative;z-index:3;margin:16px auto 0;max-width:980px;padding:0 16px 24px}
+#gcv{display:block;width:100%;height:300px;border-radius:24px;background:var(--sea-bg);touch-action:none;cursor:pointer;outline:1px solid var(--line)}
+.gpanel{position:absolute;inset:0 16px 24px;display:grid;place-content:center;justify-items:center;gap:12px;text-align:center;border-radius:24px;background:color-mix(in srgb,var(--bg) 72%,transparent)}
+.gpanel:empty{display:none}
+.gpanel h3{margin:0;font-size:24px}.gpanel p{margin:0;color:var(--muted);font-size:15px;max-width:30ch}
+.gpanel .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .mission{display:grid;justify-items:center;text-align:center;gap:24px}
 .m-quotes{display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:860px}
 @media (max-width:640px){.m-quotes{grid-template-columns:1fr}}
@@ -530,6 +540,11 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
   <div class="in credit" id="credit"></div>
   <div class="word" aria-hidden="true">ice<b>.</b>stop</div>
   <div class="floes" id="floes" aria-hidden="true"></div>
+  <div class="gbar"><button class="pill glass-pill" id="gameBtn">Играть: доплыви до Антарктиды</button></div>
+  <div class="game" id="game" hidden>
+    <canvas id="gcv" aria-label="Мини-игра: прыгайте по льдинам"></canvas>
+    <div class="gpanel" id="gpanel"></div>
+  </div>
 </footer>
 
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
@@ -992,12 +1007,77 @@ $("missionDraft").innerHTML = DATA.mission.draft ? "<b>Черновик.</b> Э�
 let lastY = scrollY;
 addEventListener("scroll", () => {
   const up = scrollY < lastY, nearEnd = scrollY + innerHeight * 2 > document.documentElement.scrollHeight; lastY = scrollY;
-  if (phone) { const r = $("support").getBoundingClientRect(); $("sbar").classList.toggle("show", scrollY > innerHeight * .8 && (r.top > innerHeight || r.bottom < 0) && !document.documentElement.classList.contains("pp")); }
-  $("toTop").classList.toggle("show", scrollY > innerHeight * 1.2 && (!phone || (up && !nearEnd)));
+  if (phone) { const r = $("support").getBoundingClientRect(); $("sbar").classList.toggle("show", scrollY > innerHeight * .8 && (r.top > innerHeight || r.bottom < 0) && document.querySelector("footer").getBoundingClientRect().top > innerHeight - 120 && !document.documentElement.classList.contains("pp")); }
+  $("toTop").classList.toggle("show", $("game").hidden && scrollY > innerHeight * 1.2 && (!phone || (up && !nearEnd)));
 }, {passive: true});
 // размеры льдин в vw: крупные на любом экране, но только касаются низа букв
 $("floes").innerHTML = [[13,3.2,0],[22,4.2,-9],[9,2.6,-17],[28,4.8,-26],[15,3.6,-34],[11,3,-41]].map(([w,h,d], i) =>
   `<i class="floe" style="width:${w}vw;height:${h}vw;animation-duration:${44 + i*7}s;animation-delay:${d}s;--x:${8 + i*15}%"></i>`).join("");
+// ===== мини-игра: Семён или Рустам бегут на юг и прыгают по льдинам; уровень — страна, где ребята сейчас =====
+{
+  const PAL = {R:"#d0263a", W:"#ffffff", S:"#f2c09a", K:"#1d1d1f", G:"#9aa0a6", D:"#2c3e50", B:"#3b2a20", C:"#2fbf8f", H:"#2a1d14", A:"#1b130d", O:"#6b7a4b"};
+  const legsA = ["..DD..DD..", "..DD..DD..", ".BBB..BBB."], legsB = [".DD....DD.", "DD......DD", "BB......BB"];
+  const HERO = {
+    "Семён": ["..RWRWRW..", ".RWRWRWRW.", ".WRSSSSRW.", ".RSKSSKSR.", ".WSSSSSSW.", "..RSSSSR..", "..RWRWRW..", ".GGGGGGGG.", "SGGGGGGGGS", "SGGGGGGGGS", "..DDDDDD.."],
+    "Рустам": ["..CCCCCC..", ".CCCCCCCCC", ".HSSSSSSH.", ".HSKSSKSH.", ".HSSSSSSH.", ".AAASSAAA.", "..AAAAAA..", ".OOOOOOOO.", "SOOOOOOOOS", "SOOOOOOOOS", "..DDDDDD.."]};
+  Object.values(HERO).concat([legsA, legsB]).forEach(rows => rows.forEach(r => console.assert(r.length === 10, "спрайт: строка не 10 символов", r)));
+  const cv = $("gcv"), ctx = cv.getContext("2d"), panel = $("gpanel"), country = DATA.nowPlace.split(" · ")[0];
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  let W, H, Y0, px = 3, hero, g, raf = 0, held = false, best = 0;
+  try { best = +localStorage.getItem("icestop-best") || 0; } catch (e) {}
+  const size = () => { const r = cv.getBoundingClientRect(), d = devicePixelRatio || 1; W = r.width; H = r.height; cv.width = W * d; cv.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0); Y0 = H - 46; px = W < 500 ? 3 : 4; };
+  const sprite = (rows, x, y) => rows.forEach((r, j) => [...r].forEach((c, i) => { if (c !== ".") { ctx.fillStyle = PAL[c]; ctx.fillRect(x + i * px, y + j * px, px, px); } }));
+  const newFloe = x => ({x, w: 70 + Math.random() * 110, ph: Math.random() * 6});
+  const start = name => {
+    hero = name; size(); panel.innerHTML = "";
+    g = {t: 0, v: 3.2, dist: 0, stamps: 0, y: Y0 - 14 * px, vy: 0, on: true, floes: [{x: -20, w: W * 1.3, ph: 0}], items: [], over: false};
+    while (g.floes.at(-1).x < W * 2) { const f = g.floes.at(-1); g.floes.push(newFloe(f.x + f.w + 50 + Math.random() * 40)); }
+    cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
+  };
+  const jump = () => { if (g && !g.over && g.on) { g.vy = -9.2; g.on = false; } };
+  const end = () => {
+    g.over = true; const km = Math.round(g.dist), rec = km > best;
+    if (rec) { best = km; try { localStorage.setItem("icestop-best", km); } catch (e) {} }
+    panel.innerHTML = `<h3>${hero} искупался!</h3><p>${km} км по льдинам · штампов: ${g.stamps}<br>${rec ? "Новый рекорд!" : "Ваш рекорд: " + best + " км"}</p>
+      <div class="row"><button class="pill" data-h="${hero}">Ещё раз</button><button class="pill glass-pill" data-pick>Сменить героя</button></div>`;
+  };
+  const loop = () => {
+    const ice = css("--ice"), sea = css("--sea"), ink = css("--ink"), acc = css("--accent");
+    g.t++; g.v = Math.min(8, 3.2 + g.t / 900); g.dist += g.v / 12;
+    // льдины едут навстречу, новые появляются справа; зазоры растут со скоростью
+    g.floes.forEach(f => f.x -= g.v); g.items.forEach(it => it.x -= g.v);
+    if (g.floes[0].x + g.floes[0].w < -10) g.floes.shift();
+    const last = g.floes.at(-1);
+    if (last.x < W * 1.5) { const gap = 40 + Math.random() * (30 + g.v * 12); const f = newFloe(last.x + last.w + gap); g.floes.push(f);
+      if (Math.random() < .5) g.items.push({x: f.x + f.w / 2, y: Y0 - 70 - Math.random() * 60, got: false}); }
+    // прыжок: держишь — летит выше
+    g.vy += held && g.vy < 0 ? .32 : .62; g.y += g.vy;
+    const hx = W * .22, feet = g.y + 14 * px, top = f => Y0 + Math.sin(g.t / 20 + f.ph) * 2;
+    const under = g.floes.find(f => hx + 8 * px > f.x && hx + 2 * px < f.x + f.w);
+    g.on = false;
+    if (under && g.vy >= 0 && feet >= top(under) && feet - g.vy <= top(under) + 6) { g.y = top(under) - 14 * px; g.vy = 0; g.on = true; }
+    g.items.forEach(it => { if (!it.got && Math.abs(it.x - (hx + 5 * px)) < 22 && Math.abs(it.y - (g.y + 7 * px)) < 30) { it.got = true; g.stamps++; g.dist += 10; } });
+    // рисуем: небо, вода, льдины, штампы, герой, счёт
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = sea; ctx.globalAlpha = .35; ctx.fillRect(0, Y0, W, H - Y0); ctx.globalAlpha = 1;
+    ctx.fillStyle = ice; g.floes.forEach(f => { const y = top(f); ctx.beginPath(); ctx.roundRect(f.x, y, f.w, 14, [10, 14, 4, 4]); ctx.fill(); });
+    g.items.forEach(it => { if (it.got) return; ctx.fillStyle = "#fff"; ctx.fillRect(it.x - 10, it.y - 12, 20, 24); ctx.fillStyle = acc; ctx.fillRect(it.x - 7, it.y - 9, 14, 18); });
+    sprite(HERO[hero], hx, g.y); sprite(g.on && (g.t >> 3) % 2 ? legsB : legsA, hx, g.y + 11 * px);
+    ctx.fillStyle = ink; ctx.font = "600 15px " + css("--f"); ctx.textAlign = "left";
+    ctx.fillText(`${Math.round(g.dist)} км · уровень «${country}»`, 16, 26); ctx.textAlign = "right"; ctx.fillText(`рекорд ${best} км`, W - 16, 26);
+    if (g.y > H) return end();
+    raf = requestAnimationFrame(loop);
+  };
+  const pick = () => { panel.innerHTML = `<h3>Кто поплывёт?</h3><p>Прыгайте по льдинам к Антарктиде: нажатие — прыжок, держите дольше — выше. Уровень «${country}».</p>
+    <div class="row">${Object.keys(HERO).map(n => `<button class="pill" data-h="${n}">${n}</button>`).join("")}</div>`; };
+  panel.onclick = e => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.h) start(b.dataset.h); else pick(); };
+  const down = e => { if (e.type === "keydown" && !(e.code === "Space" || e.code === "ArrowUp")) return; if (!g || g.over || e.repeat) return; e.preventDefault(); held = true; jump(); };
+  const up = () => { held = false; };
+  cv.addEventListener("pointerdown", down); addEventListener("pointerup", up);
+  addEventListener("keydown", e => { if ($("game").hidden) return; down(e); }); addEventListener("keyup", up);
+  $("gameBtn").onclick = () => { document.querySelector("footer").classList.add("playing"); $("game").hidden = false; size(); pick(); $("game").scrollIntoView({block: "end", behavior: "smooth"}); };
+  addEventListener("resize", () => { if (!$("game").hidden) size(); });
+}
 const A = DATA.audience.filter(a => a.n);
 const total = A.reduce((t, a) => t + a.n, 0);
 const short = n => n >= 1e5 ? Math.floor(n / 1e3) + " тыс." : fmt(n);
