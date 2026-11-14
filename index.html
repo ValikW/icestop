@@ -4,6 +4,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>body{margin:0}</style>
 <title>Автостоп в Антарктиду</title>
+<meta name="description" content="Семён и Рустам едут автостопом из Москвы в Антарктиду без купленных билетов. Где они сейчас, дневник дороги и как поддержать.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ice-stop.ru/">
+<meta property="og:title" content="Двое автостопом в Антарктиду">
+<meta property="og:description" content="Семён и Рустам едут автостопом из Москвы в Антарктиду без купленных билетов. Где они сейчас, дневник дороги и как поддержать.">
+<meta property="og:image" content="https://ice-stop.ru/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23ff6a2b'/%3E%3Cpath d='M7 22 13 12l4 6 3-4 5 8z' fill='%23fff'/%3E%3C/svg%3E">
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Layout: минимализм в духе apple.com — полноширинные секции (белая / серая), центрированные заголовки, бенто-плитки */
@@ -219,6 +228,33 @@ section:not(.alt) .t{background:var(--alt)}
 .fund .bar{max-width:420px}
 .fund .bar i{background:#30d158}
 .fund .note{padding:0;font-size:17px;color:var(--muted);margin:16px auto 0;max-width:40ch}
+/* лесенка поддержки: любая сумма → с открыткой с дороги → с открыткой из Антарктиды */
+.ladder{display:grid;gap:10px;max-width:420px;margin:28px auto 0}
+.rung{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:56px;padding:0 20px;border-radius:18px;background:var(--tile);color:var(--ink);text-align:left}
+.pill.off{pointer-events:none;opacity:.45}
+.rung:hover{text-decoration:none;filter:brightness(1.15)}
+.rung b{font-size:19px;font-weight:600;white-space:nowrap}
+.rung span{font-size:15px;color:var(--muted)}
+.rung:first-child{background:var(--accent);color:var(--accent-ink)}.rung:first-child span{color:inherit;opacity:.8}
+.rung[hidden]{display:none}
+.rung.off{pointer-events:none;opacity:.45}
+.backers{margin:14px auto 0;font-size:17px;font-weight:600;color:var(--ink)}
+.backers:empty,.pc-left:empty,.hint:empty{display:none}
+.hint{margin:12px auto 0;max-width:36ch;font-size:14px;color:var(--muted)}
+.pc-left{margin:6px 0 0;font-size:15px;font-weight:600;color:var(--accent)}
+#postcard{margin-top:72px}
+/* страница партнёров: та же страница, показываем только аудиторию и предложения */
+:root:not(.pp) #audience,:root:not(.pp) #partners,.pp main>section:not(#audience,#partners){display:none}
+/* плашка сбора внизу телефона */
+.sbar{display:none}
+@media (max-width:640px){
+  .sbar{display:flex;position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:19;align-items:center;justify-content:space-between;gap:10px;min-height:52px;padding:0 8px 0 16px;border-radius:26px;color:var(--ink);font-size:15px;
+    transform:translateY(140%);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+  .sbar.show{transform:none}
+  .sbar:hover{text-decoration:none}
+  .sbar .pill{min-height:40px;padding:0 16px;font-size:15px}
+  .to-top{bottom:calc(74px + env(safe-area-inset-bottom,0px))}
+}
 .fund .pill{margin-top:28px}
 .draft{display:inline-block;margin:14px auto 0;max-width:46ch;font-size:13px;line-height:1.45;color:var(--muted);border:1px dashed var(--line);border-radius:12px;padding:8px 12px}
 .draft b{color:var(--accent);font-weight:600}
@@ -242,10 +278,6 @@ section:not(.alt) .t{background:var(--alt)}
 .acc .anote{grid-column:1 / -1;font-size:14px;color:var(--muted)}
 .acc .go{grid-column:1 / -1;font-size:15px}
 /* партнёрам */
-.aud{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px;margin-bottom:16px}
-.aud .t{text-align:center}
-section .aud .t.total{background:var(--accent);color:var(--accent-ink)}
-.aud .total .l,.aud .total .h{color:inherit;opacity:.75}
 .offers{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
 .offers p{margin:4px 0 0;font-size:17px;line-height:1.45}
 @media (max-width:640px){.offers{grid-template-columns:1fr}}
@@ -297,6 +329,9 @@ footer{position:sticky;bottom:0;z-index:0;overflow:hidden;padding-block:40px 0;b
   display:grid;place-items:center;color:var(--ink);font-size:20px;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .3s,transform .3s}
 .to-top.show{opacity:1;transform:none;pointer-events:auto}
 .to-top:hover{text-decoration:none}
+footer .credit{margin-top:14px;justify-content:center;gap:6px 14px}
+footer .credit:empty{display:none}
+footer .credit a{min-height:44px;display:inline-flex;align-items:center}
 footer .in{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
 .links{display:flex;gap:20px;flex-wrap:wrap}
 .links a{font-size:14px;min-height:44px;display:inline-flex;align-items:center}
@@ -327,12 +362,6 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
   .circle .snd[data-on]::before{
     -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9h4l5-4v14l-5-4H3z' fill='black'/%3E%3Cpath d='M16 8.5a5 5 0 0 1 0 7M19 5.5a9 9 0 0 1 0 13'/%3E%3C/svg%3E");
     mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9h4l5-4v14l-5-4H3z' fill='black'/%3E%3Cpath d='M16 8.5a5 5 0 0 1 0 7M19 5.5a9 9 0 0 1 0 13'/%3E%3C/svg%3E")}
-  /* «Партнёрам»: цифры по две в ряд, общая — во всю ширину */
-  .aud{grid-template-columns:1fr 1fr;gap:12px}
-  .aud .total{grid-column:1 / -1}
-  .aud .t{padding:18px 12px}
-  .aud .l{font-size:14px}
-  .aud .v{font-size:30px}
 }
 </style>
 
@@ -341,11 +370,10 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
     <a class="logo" href="#top">ice.stop</a>
     <nav aria-label="Разделы">
       <a href="#route">Маршрут</a>
-      <a href="#numbers">Цифры</a>
       <a href="#diary">Дневник</a>
       <a href="#postcard">Открытки</a>
-      <a href="#audience">Аудитория</a>
-      <a href="#partners">Партнёрам</a>
+      <a href="#numbers">Цифры</a>
+      <a href="partners.html">Партнёрам</a>
       <a class="pill sm" href="#support">Поддержать</a>
     </nav>
   </div>
@@ -389,6 +417,61 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
     </div>
   </section>
 
+  <section id="diary">
+    <div class="in">
+      <div class="head"><h2>Дневник.</h2><p class="num" id="dayCount"></p><div><p class="draft" id="diaryDraft"></p></div></div>
+      <div class="seg-ctl"><div class="glass" role="group" aria-label="Фильтр дней">
+        <button class="chip" data-f="all" aria-pressed="true">Все</button>
+        <button class="chip" data-f="road" aria-pressed="false">Трасса</button>
+        <button class="chip" data-f="sea" aria-pressed="false">По воде</button>
+        <button class="chip" data-f="rest" aria-pressed="false">Стоянки</button>
+      </div></div>
+      <ul class="days" id="days" aria-live="polite"></ul>
+    </div>
+  </section>
+
+  <section class="alt" id="support">
+    <div class="in fund">
+      <h2 class="eyebrow">Сбор на экспедицию</h2>
+      <div class="big num" id="raised"></div>
+      <div class="of num"><span id="goalSum"></span> · <span id="fundPct"></span></div>
+      <div class="bar" id="fundBarWrap" role="progressbar" aria-label="Собрано" aria-valuemin="0" aria-valuemax="100"><i id="fundBar"></i></div>
+      <p class="note" id="fundNote"></p>
+      <p class="backers" id="backers"></p>
+      <p class="hint" id="backerNames"></p>
+      <div class="ladder">
+        <a class="rung" id="donateBtn" target="_blank" rel="noopener"><b>Любая сумма</b><span>Поддержать онлайн</span></a>
+        <a class="rung" id="rungRoad" target="_blank" rel="noopener"><b id="rungRoadP"></b><span>и открытка с дороги</span></a>
+        <a class="rung" id="rungIce" target="_blank" rel="noopener"><b id="rungIceP"></b><span>и открытка из Антарктиды</span></a>
+      </div>
+      <p class="hint">Хотите в список поддержавших? Напишите в сообщении к донату имя и город, например «Валера из Минска». Без подписи покажем вас анонимно.</p>
+      <div><p class="draft" id="donateDraft"></p></div>
+      <div class="pay" id="pay"></div>
+    </div>
+    <div id="postcard">
+      <div class="in pc-wrap">
+        <div class="card" aria-hidden="true">
+          <div class="stamp"><span id="pcStampCountry"></span><svg viewBox="0 0 60 30"><path d="M0 30 18 8l10 12 9-9 23 19Z" fill="currentColor"/></svg></div>
+          <div class="postmark"><span id="pcMarkCity"></span><b id="pcMarkDate"></b></div>
+          <p class="hand" id="pcHand"></p>
+          <div class="addr"><i></i><i></i><i></i></div>
+        </div>
+        <div class="pc-text">
+          <div class="seg-ctl pc-switch"><div class="glass" role="group" aria-label="Какую открытку">
+            <button class="chip" data-pc="road" aria-pressed="true">С дороги</button>
+            <button class="chip" data-pc="ice" aria-pressed="false">Из Антарктиды</button>
+          </div></div>
+          <h3 id="pcTitle"></h3>
+          <p class="pc-sub" id="pcSub"></p>
+          <div class="pc-price num" id="pcPrice"></div>
+            <p class="pc-left" id="pcLeft"></p>
+          <ol class="steps"><li>Оплатите открытку</li><li>Укажите адрес доставки в Tribute</li><li id="pcWait"></li></ol>
+          <div class="pc-btns"><a class="pill" id="pcPay" target="_blank" rel="noopener">Заказать открытку</a></div>
+        </div>
+    </div>
+    </div>
+  </section>
+
   <section id="numbers">
     <div class="in">
       <div class="head"><h2>Дорога в цифрах.</h2></div>
@@ -407,53 +490,16 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
     </div>
   </section>
 
-  <section id="diary">
-    <div class="in">
-      <div class="head"><h2>Дневник.</h2><p class="num" id="dayCount"></p><div><p class="draft" id="diaryDraft"></p></div></div>
-      <div class="seg-ctl"><div class="glass" role="group" aria-label="Фильтр дней">
-        <button class="chip" data-f="all" aria-pressed="true">Все</button>
-        <button class="chip" data-f="road" aria-pressed="false">Трасса</button>
-        <button class="chip" data-f="sea" aria-pressed="false">По воде</button>
-        <button class="chip" data-f="rest" aria-pressed="false">Стоянки</button>
-      </div></div>
-      <ul class="days" id="days" aria-live="polite"></ul>
-    </div>
+  <section id="mission-sec">
+  <div class="in mission">
+    <h2 class="eyebrow">Наша миссия</h2>
+    <p class="m-goal" id="missionGoal"></p>
+    <div class="m-quotes" id="mission"></div>
+    <p class="draft" id="missionDraft"></p>
+    <a class="up glass" href="#top">↑ Наверх</a>
+  </div>
   </section>
 
-  <section id="postcard">
-    <div class="in pc-wrap">
-      <div class="card" aria-hidden="true">
-        <div class="stamp"><span id="pcStampCountry"></span><svg viewBox="0 0 60 30"><path d="M0 30 18 8l10 12 9-9 23 19Z" fill="currentColor"/></svg></div>
-        <div class="postmark"><span id="pcMarkCity"></span><b id="pcMarkDate"></b></div>
-        <p class="hand" id="pcHand"></p>
-        <div class="addr"><i></i><i></i><i></i></div>
-      </div>
-      <div class="pc-text">
-        <div class="seg-ctl pc-switch"><div class="glass" role="group" aria-label="Какую открытку">
-          <button class="chip" data-pc="road" aria-pressed="true">С дороги</button>
-          <button class="chip" data-pc="ice" aria-pressed="false">Из Антарктиды</button>
-        </div></div>
-        <h3 id="pcTitle"></h3>
-        <p class="pc-sub" id="pcSub"></p>
-        <div class="pc-price num" id="pcPrice"></div>
-        <ol class="steps"><li>Оплатите открытку</li><li>Пришлите адрес в Telegram</li><li id="pcWait"></li></ol>
-        <div class="pc-btns"><a class="pill" id="pcPay" target="_blank" rel="noopener">Заказать открытку</a><a class="chev" id="pcTg" target="_blank" rel="noopener">Прислать адрес</a></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="alt" id="support">
-    <div class="in fund">
-      <h2 class="eyebrow">Сбор на экспедицию</h2>
-      <div class="big num" id="raised"></div>
-      <div class="of num"><span id="goalSum"></span> · <span id="fundPct"></span></div>
-      <div class="bar" id="fundBarWrap" role="progressbar" aria-label="Собрано" aria-valuemin="0" aria-valuemax="100"><i id="fundBar"></i></div>
-      <p class="note" id="fundNote"></p>
-      <a class="pill" id="donateBtn" target="_blank" rel="noopener">Поддержать онлайн</a>
-      <div><p class="draft" id="donateDraft"></p></div>
-      <div class="pay" id="pay"></div>
-    </div>
-  </section>
   <section class="alt" id="audience">
     <div class="in">
       <div class="head"><h2>Аудитория.</h2><p>Столько людей следят за дорогой в Антарктиду.</p></div>
@@ -465,7 +511,6 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
   <section id="partners">
     <div class="in">
       <div class="head"><h2>Партнёрам.</h2><p>Ваш бренд проедет с нами от Москвы до Антарктиды — в кадре, на снаряжении и на этом сайте.</p></div>
-      <div class="aud" id="aud"></div>
       <div class="offers">
         <div class="t"><div class="l">Реклама в контенте</div><p>Нативная интеграция в кружочки, рилсы и посты прямо с трассы.</p></div>
         <div class="t"><div class="l">Тест снаряжения</div><p>Проверим одежду, обувь, палатки, павербанки в горах, пустыне и на льду — и честно расскажем.</p></div>
@@ -476,20 +521,13 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
       <div class="ctas" style="margin-top:36px"><a class="pill" id="partnerBtn" target="_blank" rel="noopener">Обсудить сотрудничество</a></div>
     </div>
   </section>
-  <section class="alt" id="mission-sec">
-  <div class="in mission">
-    <h2 class="eyebrow">Наша миссия</h2>
-    <p class="m-goal" id="missionGoal"></p>
-    <div class="m-quotes" id="mission"></div>
-    <p class="draft" id="missionDraft"></p>
-    <a class="up glass" href="#top">↑ Наверх</a>
-  </div>
-  </section>
 </main>
 
+<a class="sbar glass" id="sbar" href="#support"><span>Собрано <b id="sbarSum"></b></span><span class="pill">Поддержать</span></a>
 <a class="to-top glass" id="toTop" href="#top" aria-label="Наверх, к началу сайта">↑</a>
 <footer>
-  <div class="in"><span>Двое автостопом в Антарктиду · сейчас <span id="footNow"></span></span><div class="links" id="links"></div></div>
+  <div class="in"><span>Двое автостопом в Антарктиду · сейчас <span id="footNow"></span></span><div class="links" id="links"></div><a href="partners.html">Реклама и партнёрство</a></div>
+  <div class="in credit" id="credit"></div>
   <div class="word" aria-hidden="true">ice<b>.</b>stop</div>
   <div class="floes" id="floes" aria-hidden="true"></div>
 </footer>
@@ -509,7 +547,6 @@ const ROADS = {"track":[[[37.617,55.756],[37.73,55.709],[37.816,55.693],[38.007,
 const DATA = {
   title: "Двое автостопом в Антарктиду",
   subtitle: "Из Москвы через Кавказ до Ледяного континента без единого купленного билета",
-  updated: "сегодня",
   why: "Проверить, можно ли добраться до самого края Земли только на доброте людей: попутках, грузовиках, яхтах и кораблях. Попутно — снять, как живут водители, моряки и полярники по пути.",
   startDate: "2026-09-20",
   totalKm: 21600,
@@ -571,7 +608,6 @@ const DATA = {
     // временная пометка для ребят под кнопкой; убрать (сделать пустой), когда подключат оплату
     draftNote:""}, // ссылка на их страницу доната (Boosty, DonationAlerts, Tribute и т.п.)
   pay: [
-    {name:"Карта", value:"0000 0000 0000 0000"},
     {name:"USDT TRC20", value:"TRMtZhtkeCQ87994NBo8xKuzZSzXMdCQA4"},
   ],
   // партнёрам: аудитория по площадкам (n — число подписчиков; пусто — площадка не показывается), кто уже помог, контакт
@@ -582,12 +618,16 @@ const DATA = {
     {who:"Рустам", name:"Instagram", handle:"rustam.shikari", url:"https://www.instagram.com/rustam.shikari/", n:211000, note:"«К чёрту всё, бери и делай!»"},
     {who:"Рустам", name:"Telegram", handle:"Extraordinarione", url:"https://t.me/Extraordinarione", n:4090, note:"≈ 700 просмотров на пост"},
   ],
+  // кто поддержал — из сообщения к донату в Tribute: name и city — только если человек сам их написал (это и есть разрешение), иначе name пустой → «Аноним»; country — для счёта стран
+  // city — как в подписи «из …»: {name:"Валера", city:"Минска", country:"Беларусь"} → «Валера из Минска»
+  backers: [],
   supporters: ["«Лиза Алерт» — тёплые флиски в дорогу"],
   partnerTelegram: "", // ник для связи по рекламе (без @); пусто — директ Instagram из partnerUrl
   partnerUrl: "https://ig.me/m/pr.rustam.shikari", // рекламный аккаунт из шапки Instagram Рустама
-  // открытки: price — цена, payUrl — ссылка на оплату, telegram — ник, кому присылать адрес (без @)
-  postcard: {price:"1 500 ₽", country:"Ирака", city:"Захо", payUrl:"https://t.me/tribute/app?startapp=hKd9", telegram:"",
-    antarctica: {price:"5 000 ₽", payUrl:"https://boosty.to/"}},
+  // открытки: price — цена, payUrl — ссылка на оплату в Tribute (адрес покупатель указывает там же); у Антарктиды пустой payUrl — вариант скрыт
+  postcard: {price:"1 500 ₽", country:"Ирака", city:"Захо", payUrl:"https://t.me/tribute/app?startapp=hKd9",
+    limit:30, sold:0, // лимит ништяков на страну; sold — сколько уже заказано из этой страны (при смене страны обнулить)
+    antarctica: {price:"5 000 ₽", payUrl:""}},
   // миссия — слова ребят в подвале; draft:true показывает пометку, что текст временный
   mission: {draft:false,
     goal:"Доказать, что главные ограничения — только в голове человека. Чтобы начать жить жизнью своей мечты, не нужны миллионы или связи. Достаточно сделать первый шаг.",
@@ -595,6 +635,8 @@ const DATA = {
     {who:"Семён", text:"Я хочу показать, что яркая, насыщенная жизнь — не привилегия избранных. Она доступна каждому, кто готов пробовать новое, пользоваться возможностями и не бояться перемен. Хочется, чтобы люди не откладывали жизнь на потом и однажды не жалели о том, что так и не решились."},
     {who:"Рустам", text:"Для меня Антарктида — только начало большого пути. Я хочу показать, что даже обычный парень без особых стартовых возможностей может замахнуться на большую мечту, добиться своего и создать что-то действительно масштабное."},
   ]},
+  // кто сделал сайт — строка в самом низу; tg/ig — ники без @, пустые не показываются
+  credit: {text:"Разработка и поддержка сайта — Валерий", tg:"valik_vw", ig:"valikvw"},
   links: [
     {name:"Instagram Семёна", url:"https://www.instagram.com/eazylifeshow/"},
     {name:"Telegram Семёна", url:"https://t.me/easylifeshow"},
@@ -602,9 +644,9 @@ const DATA = {
     {name:"Telegram Рустама", url:"https://t.me/Extraordinarione"},
   ],
   // временная пометка для ребят под заголовком дневника; пусто — не показывается
-  diaryDraft:"Заметка для Семёна и Рустама: дневник собран автоматически из ваших постов в Telegram. Сделано быстро, поэтому взяты только ключевые куски. Дальше всё будет само: любой кружочек, голосовое или текст в Telegram превратится в заметку здесь. Настраивается быстро.",
+  diaryDraft:"",
   // временная пометка для ребят под картой; пусто — не показывается
-  mapDraft:"Для Семёна и Рустама: пока листаешь карту, на ней появляются заметки по дням с фото из вашего Telegram за этот день. Сейчас фото подобраны вручную, дальше бот будет брать их из постов сам.",
+  mapDraft:"",
   // дни: type photo — необязательная ссылка на фото дня, показывается в плашке этапа на карте road | sea | rest
   days: [
     {n:44, date:"2026-11-02", type:"road", title:"Ирак! Первый же водитель дал денег и посадил в такси", from:"Батман", to:"Захо", km:229, photo:"media/days/2026-11-02.jpg"},
@@ -633,7 +675,7 @@ const dayMs = 864e5;
 $("title").textContent = DATA.title;
 $("subtitle").textContent = DATA.subtitle;
 $("nowPlace").textContent = DATA.nowPlace;
-$("updated").textContent = DATA.updated;
+$("updated").textContent = new Date([...DATA.days, ...DATA.track].map(d => d.date).sort().pop()).toLocaleDateString("ru-RU", {day:"numeric", month:"long"});
 $("why").textContent = DATA.why;
 
 // пройдено по суше/воде: суммируем отрезки маршрута до currentKm
@@ -718,6 +760,11 @@ $("pay").onclick = e => {
 var routeScrub, routeFrac; // заполняет drawMap
 // телефон: секции без наезда, карта без залипания, дни — карточками (ponytail: проверяется один раз при загрузке, поворот экрана не перестраивает)
 const phone = matchMedia("(max-width:640px)").matches;
+// partners.html — та же страница, только аудитория и предложения брендам; ссылки меню ведут на главную
+if (/partners/.test(location.pathname)) {
+  document.documentElement.classList.add("pp");
+  document.querySelectorAll('.nav a[href^="#"], footer a[href^="#"]').forEach(a => a.href = "./" + a.getAttribute("href"));
+}
 function drawMap() {
   const W = 1000, H = 640, S = DATA.stops, ll = p => [p[1], p[0]]; // [lat,lon] → [lon,lat]
   const svg = d3.select("#mapSvg").attr("viewBox", `0 0 ${W} ${H}`);
@@ -895,7 +942,7 @@ $("helloDraft").innerHTML = DATA.helloDraft ? `<b>Черновик.</b> ${DATA.h
 $("says").innerHTML = DATA.hello.some(h => h.say) ? DATA.hello.map(() => `<q></q>`).join("") : "";
 $("duo").innerHTML = DATA.hello.map((h, i) => `<div class="person">
   <button class="circle" data-i="${i}" aria-label="Приветствие: ${h.name}. Включить звук">
-    ${h.video ? `<video src="${h.video}" poster="${h.video.replace(/\.mp4$/, ".jpg")}" muted playsinline preload="auto"></video>` : `<span class="play" aria-hidden="true">▶</span>`}
+    ${h.video ? `<video src="${h.video}" poster="${h.video.replace(/\.mp4$/, ".jpg")}" muted playsinline preload="metadata"></video>` : `<span class="play" aria-hidden="true">▶</span>`}
     <span class="snd glass" aria-hidden="true">🔇</span></button>${h.name}</div>`).join("");
 // Семён играет первым, по окончании — Рустам (Семён кидает ему мяч). Текст под кружком набирается в такт речи.
 // клик — включить звук у этого кружка и с начала, у другого выключить; кольцо = прогресс видео
@@ -935,6 +982,8 @@ $("duo").querySelectorAll(".circle").forEach(btn => {
 // стартуем, когда приветствие видно на экране
 if (vids[0]) new IntersectionObserver((e, o) => { if (e[0].isIntersecting) { o.disconnect(); vids[0].play().catch(() => {}); } }, {threshold:.5}).observe(vids[0]);
 $("footNow").textContent = DATA.nowPlace;
+{ const C = DATA.credit || {};
+  $("credit").innerHTML = C.text ? `<span>${C.text}</span>` + (C.tg ? `<a href="https://t.me/${C.tg}" target="_blank" rel="noopener">Telegram</a>` : "") + (C.ig ? `<a href="https://www.instagram.com/${C.ig}/" target="_blank" rel="noopener">Instagram</a>` : "") : ""; }
 // льдины: размеры и скорость случайные, но стабильные между перезагрузками
 $("missionGoal").textContent = DATA.mission.goal || "";
 $("mission").innerHTML = DATA.mission.quotes.map(q => `<figure><blockquote>${q.text}</blockquote><figcaption>${q.who}</figcaption></figure>`).join("");
@@ -943,6 +992,7 @@ $("missionDraft").innerHTML = DATA.mission.draft ? "<b>Черновик.</b> Э�
 let lastY = scrollY;
 addEventListener("scroll", () => {
   const up = scrollY < lastY, nearEnd = scrollY + innerHeight * 2 > document.documentElement.scrollHeight; lastY = scrollY;
+  if (phone) { const r = $("support").getBoundingClientRect(); $("sbar").classList.toggle("show", scrollY > innerHeight * .8 && (r.top > innerHeight || r.bottom < 0) && !document.documentElement.classList.contains("pp")); }
   $("toTop").classList.toggle("show", scrollY > innerHeight * 1.2 && (!phone || (up && !nearEnd)));
 }, {passive: true});
 // размеры льдин в vw: крупные на любом экране, но только касаются низа букв
@@ -955,8 +1005,6 @@ $("audTotal").textContent = (total >= 1e4 ? Math.floor(total / 1e3) + " тыс."
 $("people").innerHTML = [...new Set(DATA.audience.map(a => a.who))].map(w => `<div class="t"><div class="who">${w}</div>` +
   A.filter(a => a.who === w).map(a => `<div class="acc"><div><div class="net">${a.name}</div><div class="hdl">@${a.handle}</div></div><div class="cnt num">${short(a.n)}</div>
     <div class="anote">${a.note}</div><a class="go chev" href="${a.url}" target="_blank" rel="noopener">Подписаться</a></div>`).join("") + `</div>`).join("");
-$("aud").innerHTML = (A.length < 2 ? "" : `<div class="t total"><div class="l">Общая аудитория</div><div class="v num">${short(total)}+</div><div class="h">подписчиков</div></div>`) +
-  A.map(a => `<div class="t"><div class="l">${a.name} · ${a.who}</div><div class="v num">${short(a.n)}</div><div class="h">${a.note || "подписчиков"}</div></div>`).join("");
 $("thanks").innerHTML = DATA.supporters.length ? "Нас уже поддержали: " + DATA.supporters.map(x => `<b>${x}</b>`).join(", ") : "";
 const tgChannel = (DATA.links.find(l => l.name.startsWith("Telegram")) || {}).url;
 $("partnerBtn").href = DATA.partnerTelegram ? `https://t.me/${DATA.partnerTelegram}?text=${encodeURIComponent("Здравствуйте! Хотим обсудить сотрудничество с экспедицией ice.stop.")}` : DATA.partnerUrl;
@@ -977,11 +1025,24 @@ const showPc = k => {
   $("pcStampCountry").textContent = c.country; $("pcMarkCity").textContent = c.city;
   $("pcMarkDate").textContent = c.date ? c.date.toLocaleDateString("ru-RU", {day:"2-digit", month:"2-digit", year:"2-digit"}) : "скоро";
   $("pcPay").href = c.pay;
-  // ссылка открывает чат с ребятами с готовым началом сообщения; сам адрес человек вписывает в Telegram
-  $("pcTg").href = P.telegram ? `https://t.me/${P.telegram}?text=${encodeURIComponent(`Хочу открытку ${c.ask}. Мой адрес: `)}` : (DATA.links.find(l => l.name.startsWith("Telegram")) || {}).url;
 };
 document.querySelectorAll(".chip[data-pc]").forEach(b => b.onclick = () => showPc(b.dataset.pc));
 showPc("road");
+$("rungRoad").href = P.payUrl; $("rungRoadP").textContent = P.price;
+// лимит ништяков на страну: остаток видно у открытки и на ступеньке; кончились — кнопки закрываются до следующей страны
+{ const left = Math.max(0, (P.limit || 0) - (P.sold || 0));
+  if (P.limit) {
+    $("pcLeft").textContent = left ? `Осталось ${left} из ${P.limit} из ${P.country}` : `Из ${P.country} всё разобрали — следующие из новой страны`;
+    $("rungRoad").querySelector("span").textContent = left ? `и открытка с дороги · осталось ${left}` : "открытки из этой страны закончились";
+    if (!left) { $("rungRoad").classList.add("off"); $("pcPay").classList.add("off"); $("pcPay").textContent = "Разобрали"; }
+  } }
+{ const B = DATA.backers || [], n = new Set(B.map(b => b.country).filter(Boolean)).size, c = new Set(B.map(b => b.city).filter(Boolean)).size;
+  const pl = (k, a, b, c) => k % 10 === 1 && k % 100 !== 11 ? a : k % 10 >= 2 && k % 10 <= 4 && (k % 100 < 10 || k % 100 >= 20) ? b : c;
+  $("backerNames").textContent = B.slice(-12).reverse().map(b => (b.name || "Аноним") + (b.city ? ` из ${b.city}` : "")).join(" · ");
+  $("backers").textContent = B.length ? `Нас поддержали ${B.length} ${pl(B.length, "человек", "человека", "человек")}` + (n ? ` из ${n} ${pl(n, "страны", "стран", "стран")}` : "") + (c ? `${n ? " и" : " из"} ${c} ${pl(c, "города", "городов", "городов")}` : "") : ""; }
+$("rungIce").href = P.antarctica.payUrl; $("rungIceP").textContent = P.antarctica.price; $("rungIce").hidden = !P.antarctica.payUrl;
+$("sbarSum").textContent = $("raised").textContent;
+if (!P.antarctica.payUrl) document.querySelector(".pc-switch").style.display = "none";
 // ===== эффекты прокрутки (выключены, если человек просил браузер не анимировать) =====
 const fxOn = !matchMedia("(prefers-reduced-motion: reduce)").matches;
 if (fxOn) document.documentElement.classList.add("fx");
@@ -1037,16 +1098,17 @@ addEventListener("DOMContentLoaded", () => {
   place(); tick();
 
   const once = (el, fn, threshold = .35) => { const io = new IntersectionObserver(es => { if (es[0].isIntersecting) { io.disconnect(); fn(); } }, {threshold}); io.observe(el); };
-  // 5. числа отсчитываются с нуля, полоски заполняются
+  // 5. числа добегают до настоящего значения с 80% (нуля на экране не бывает), полоски заполняются
   const countUp = el => {
     const tn = [...el.childNodes].find(n => n.nodeType === 3 && /\d/.test(n.textContent));
     if (!tn) return;
     const full = tn.textContent, m = full.match(/\d[\d\s\u00a0]*/), target = +m[0].replace(/\D/g, "");
     const pad = m[0].endsWith(" ") ? " " : "";
-    tn.textContent = full.replace(m[0], "0" + pad);
-    return () => { const t0 = performance.now(), dur = 2200;
+    const from = Math.round(target * .8);
+    tn.textContent = full.replace(m[0], fmt(from) + pad);
+    return () => { const t0 = performance.now(), dur = 1400;
     const step = t => { const q = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - q, 3);
-      tn.textContent = full.replace(m[0], fmt(Math.round(target * e)) + pad); if (q < 1) requestAnimationFrame(step); };
+      tn.textContent = full.replace(m[0], fmt(Math.round(from + (target - from) * e)) + pad); if (q < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step); };
   };
   ["done", "audTotal", "raised"].forEach(id => { const run = $(id) && countUp($(id)); if (run) once($(id), run, .8); });
