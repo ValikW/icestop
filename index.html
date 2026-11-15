@@ -268,7 +268,7 @@ section:not(.alt) .t{background:var(--alt)}
 .pc-left{margin:6px 0 0;font-size:15px;font-weight:600;color:var(--accent)}
 #postcard{margin-top:72px}
 /* страница партнёров: та же страница, показываем только аудиторию и предложения */
-:root:not(.pp) #audience,:root:not(.pp) #partners,.pp main>section:not(#audience,#partners){display:none}
+:root:not(.pp) #audience,:root:not(.pp) #partners,.pp main>section:not(#phero,#audience,#partners){display:none}
 /* плашка сбора внизу телефона */
 .sbar{display:none}
 @media (max-width:640px){
@@ -305,6 +305,30 @@ section:not(.alt) .t{background:var(--alt)}
 .offers{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
 .offers p{margin:4px 0 0;font-size:17px;line-height:1.45}
 @media (max-width:640px){.offers{grid-template-columns:1fr}}
+#phero{display:none}
+.pp #phero{display:block;text-align:center}
+#phero h1{font-size:clamp(36px,6vw,64px);line-height:1.08;letter-spacing:-.015em;margin:12px auto 0;max-width:18ch}
+#phero .sub{font-size:clamp(18px,2.2vw,22px);line-height:1.4;color:var(--muted);margin:18px auto 0;max-width:40ch}
+#phero .sub b{color:var(--ink);font-weight:600}
+.pstats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:900px;margin:40px auto 8px}
+.pstats div{padding:20px 12px;border-radius:20px;background:var(--tile)}
+.pstats b{display:block;font-size:clamp(26px,3.4vw,38px);font-weight:700;letter-spacing:-.02em}
+.pstats span{display:block;margin-top:4px;font-size:14px;color:var(--muted)}
+@media (max-width:640px){.pstats{grid-template-columns:1fr 1fr}}
+.askstats{margin:28px auto 0;max-width:760px;padding:22px;border-radius:24px;background:var(--tile);display:flex;align-items:center;gap:18px;justify-content:space-between}
+.askstats p{margin:0;font-size:17px;line-height:1.45;color:var(--muted)}.askstats b{color:var(--ink)}
+@media (max-width:640px){.askstats{flex-direction:column;align-items:stretch;text-align:center}}
+.offers .gets{margin-top:10px;font-size:15px;color:var(--muted)}
+.pex,.steps3{max-width:760px;margin:48px auto 0;text-align:center}
+.pex h3,.steps3 h3{font-size:24px;margin:0 0 18px}
+.pex[hidden]{display:none}
+.pexrow{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pexrow figure{margin:0}.pexrow .rv{position:relative;display:block;width:100%;aspect-ratio:1;padding:0;border:0;border-radius:50%;overflow:hidden;cursor:pointer;background:var(--tile)}
+.pexrow video{width:100%;height:100%;object-fit:cover}
+.pexrow .rv::after{content:"▶";position:absolute;right:6%;bottom:6%;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-size:13px}
+.pexrow .rv.on::after{content:"❚❚";font-size:10px}
+.pexrow figcaption{margin-top:8px;font-size:14px;color:var(--muted)}
+.steps3 ol{text-align:left;display:grid;gap:12px;padding-left:22px;margin:0 auto;max-width:520px;font-size:17px;line-height:1.45;color:var(--muted)}.steps3 b{color:var(--ink)}
 .thanks{text-align:center;margin-top:36px;color:var(--muted);font-size:17px}
 .thanks b{color:var(--ink)}
 /* открытка */
@@ -534,11 +558,30 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
   </div>
   </section>
 
+  <section id="phero">
+    <div class="in">
+      <p class="eyebrow">Для брендов и рекламодателей</p>
+      <h1>Ваш бренд — в экспедиции из Москвы в Антарктиду</h1>
+      <p class="sub">Двое блогеров едут автостопом на край Земли и каждый день показывают дорогу в кружочках, рилсах и постах. Сейчас: <b id="ppNow"></b>.</p>
+      <div class="pstats">
+        <div><b class="num" id="ppAud"></b><span>подписчиков у Семёна и Рустама</span></div>
+        <div><b class="num" id="ppKm"></b><span>уже пройдено автостопом</span></div>
+        <div><b class="num" id="ppDays"></b><span>в дороге каждый день</span></div>
+        <div><b class="num" id="ppPosts">600+</b><span>записей с дороги в Telegram</span></div>
+      </div>
+      <div class="ctas"><a class="pill pbtn" target="_blank" rel="noopener">Обсудить сотрудничество</a><a class="chev" href="./">Смотреть экспедицию</a></div>
+    </div>
+  </section>
+
   <section class="alt" id="audience">
     <div class="in">
       <div class="head"><h2>Аудитория.</h2><p>Столько людей следят за дорогой в Антарктиду.</p></div>
       <div class="aud-total"><div class="big num" id="audTotal"></div><p>подписчиков на всех площадках</p></div>
       <div class="people" id="people"></div>
+      <div class="askstats">
+        <p><b>Нужны подробные цифры?</b> Охваты, регионы, возраст, статистика сторис и рилс — напишите, пришлём всё прямо в переписке, сразу и без лишних вопросов.</p>
+        <a class="pill pbtn" target="_blank" rel="noopener">Запросить статистику</a>
+      </div>
     </div>
   </section>
 
@@ -546,13 +589,15 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
     <div class="in">
       <div class="head"><h2>Партнёрам.</h2><p>Ваш бренд проедет с нами от Москвы до Антарктиды — в кадре, на снаряжении и на этом сайте.</p></div>
       <div class="offers">
-        <div class="t"><div class="l">Реклама в контенте</div><p>Нативная интеграция в кружочки, рилсы и посты прямо с трассы.</p></div>
-        <div class="t"><div class="l">Тест снаряжения</div><p>Проверим одежду, обувь, палатки, павербанки в горах, пустыне и на льду — и честно расскажем.</p></div>
-        <div class="t"><div class="l">Бренд на экспедиции</div><p>Логотип на одежде, рюкзаках и в разделе партнёров на сайте.</p></div>
-        <div class="t"><div class="l">Партнёр этапа</div><p>Спонсор конкретной страны или участка пути: ночлег, транспорт, связь, страховка.</p></div>
+        <div class="t"><div class="l">Реклама в контенте</div><p>Нативная интеграция в кружочки, рилсы и посты прямо с трассы.</p><p class="gets">Вы получаете: рассказ о продукте в живой истории — от двух авторов сразу, в Instagram и Telegram.</p></div>
+        <div class="t"><div class="l">Тест снаряжения</div><p>Проверим одежду, обувь, палатки, павербанки в горах, пустыне и на льду — и честно расскажем.</p><p class="gets">Вы получаете: честный обзор в реальных условиях и контент, который можно использовать у себя.</p></div>
+        <div class="t"><div class="l">Бренд на экспедиции</div><p>Логотип на одежде, рюкзаках и в разделе партнёров на сайте.</p><p class="gets">Вы получаете: бренд в кадре каждый день пути и строку на этом сайте.</p></div>
+        <div class="t"><div class="l">Партнёр этапа</div><p>Спонсор конкретной страны или участка пути: ночлег, транспорт, связь, страховка.</p><p class="gets">Вы получаете: целую главу путешествия с вашим именем — «этот участок нам помог проехать…».</p></div>
       </div>
+      <div class="pex" id="pex"><h3>Так выглядит наш контент</h3><div class="pexrow" id="pexrow"></div></div>
+      <div class="steps3"><h3>Как начать</h3><ol><li><b>Напишите нам</b> — коротко, какой продукт и какая задача.</li><li><b>Получите статистику</b> — пришлём подробные цифры по аудитории сразу в переписке.</li><li><b>Выберите формат и этап</b> — страну или участок пути, где появится ваш бренд.</li></ol></div>
       <div class="thanks" id="thanks"></div>
-      <div class="ctas" style="margin-top:36px"><a class="pill" id="partnerBtn" target="_blank" rel="noopener">Обсудить сотрудничество</a></div>
+      <div class="ctas" style="margin-top:36px"><a class="pill pbtn" id="partnerBtn" target="_blank" rel="noopener">Обсудить сотрудничество</a></div>
     </div>
   </section>
 </main>
@@ -669,7 +714,7 @@ const DATA = {
   partnerTelegram: "", // ник для связи по рекламе (без @); пусто — директ Instagram из partnerUrl
   partnerUrl: "https://ig.me/m/pr.rustam.shikari", // рекламный аккаунт из шапки Instagram Рустама
   // открытки: price — цена, payUrl — ссылка на оплату в Tribute (адрес покупатель указывает там же); у Антарктиды пустой payUrl — вариант скрыт
-  postcard: {price:"1 500 ₽", country:"Ирака", city:"Багдад", from:"Багдада", // city — на штемпеле, from — в подписи «Привет из …» payUrl:"https://t.me/tribute/app?startapp=hKd9",
+  postcard: {price:"1 500 ₽", country:"Ирака", city:"Багдад", from:"Багдада", payUrl:"https://t.me/tribute/app?startapp=hKd9", // city — на штемпеле, from — в подписи «Привет из …»
     limit:30, sold:0, // лимит ништяков на страну; sold — сколько уже заказано из этой страны (при смене страны обнулить)
     antarctica: {price:"5 000 ₽", payUrl:""}},
   // миссия — слова ребят в подвале; draft:true показывает пометку, что текст временный
@@ -1173,7 +1218,25 @@ $("people").innerHTML = [...new Set(DATA.audience.map(a => a.who))].map(w => `<d
     <div class="anote">${a.note}</div><a class="go chev" href="${a.url}" target="_blank" rel="noopener">Подписаться</a></div>`).join("") + `</div>`).join("");
 $("thanks").innerHTML = DATA.supporters.length ? "Нас уже поддержали: " + DATA.supporters.map(x => `<b>${x}</b>`).join(", ") : "";
 const tgChannel = (DATA.links.find(l => l.name.startsWith("Telegram")) || {}).url;
-$("partnerBtn").href = DATA.partnerTelegram ? `https://t.me/${DATA.partnerTelegram}?text=${encodeURIComponent("Здравствуйте! Хотим обсудить сотрудничество с экспедицией ice.stop.")}` : DATA.partnerUrl;
+const partnerHref = DATA.partnerTelegram ? `https://t.me/${DATA.partnerTelegram}?text=${encodeURIComponent("Здравствуйте! Хотим обсудить сотрудничество с экспедицией ice.stop.")}` : DATA.partnerUrl;
+document.querySelectorAll(".pbtn").forEach(a => a.href = partnerHref);
+if (document.documentElement.classList.contains("pp")) {
+  { const nb = document.querySelector(".nav a.pill"); nb.textContent = "Обсудить"; nb.href = partnerHref; nb.target = "_blank"; }
+  $("ppNow").textContent = DATA.nowPlace.replace(" · ", ", ");
+  $("ppAud").textContent = $("audTotal").textContent;
+  $("ppKm").textContent = fmt(DATA.currentKm) + " км";
+  { const d = Math.floor((Date.now() - new Date(DATA.startDate)) / dayMs) + 1; $("ppDays").textContent = d + " " + (d % 10 === 1 && d % 100 !== 11 ? "день" : d % 10 >= 2 && d % 10 <= 4 && (d % 100 < 10 || d % 100 >= 20) ? "дня" : "дней"); }
+  $("pex").hidden = true;
+  feedReady.then(fd => { if (!fd) return;
+    const n = fd.reduce((t, d) => t + d.posts.length, 0); $("ppPosts").textContent = fmt(n);
+    const ex = fd.map(d => d.posts.find(p => p.id === d.main)).filter(p => p && p.kind === "circle" && p.poster).slice(0, 3);
+    if (ex.length < 3) return;
+    $("pexrow").innerHTML = ex.map(p => `<figure><button class="rv" aria-label="Смотреть кружочек: ${p.author}"><video src="${FEED + p.media}" poster="${FEED + p.poster}" preload="none" playsinline></video></button><figcaption>${p.author} · ${new Date(p.day).toLocaleDateString("ru-RU", {day:"numeric", month:"long"})}</figcaption></figure>`).join("");
+    $("pex").hidden = false; });
+  $("pexrow").addEventListener("click", e => { const b = e.target.closest(".rv"); if (!b) return; const v = b.querySelector("video");
+    document.querySelectorAll("#pexrow video").forEach(o => { if (o !== v) { o.pause(); o.parentNode.classList.remove("on"); } });
+    if (v.paused) { v.play(); b.classList.add("on"); } else { v.pause(); b.classList.remove("on"); } v.onended = () => b.classList.remove("on"); });
+}
 const P = DATA.postcard;
 // два вида открытки: с дороги (страна, где ребята сейчас) и из Антарктиды
 const PC = {
@@ -1292,4 +1355,17 @@ addEventListener("DOMContentLoaded", () => {
 // рукописный шрифт открытки подключается последним: страница его не ждёт
 document.head.insertAdjacentHTML("beforeend", '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap">');
 $("links").innerHTML = DATA.links.map(l => `<a href="${l.url}" target="_blank" rel="noopener">${l.name}</a>`).join("");
+// статистика для админки (ice-stop.ru/admin): просмотр страницы и клики по главным кнопкам; на других хостах не шлём
+if (location.hostname.endsWith("ice-stop.ru")) {
+  const beacon = u => { try { navigator.sendBeacon(u); } catch (e) {} };
+  beacon("/admin/api/hit?p=" + (/partners/.test(location.pathname) ? "partners" : "index")
+    + "&r=" + encodeURIComponent(document.referrer) + "&" + location.search.slice(1));
+  document.addEventListener("click", e => {
+    const a = e.target.closest("#donateBtn,#rungRoad,#rungIce,#pcPay,.pbtn,#gameBtn,.pp .nav a.pill");
+    if (!a) return;
+    const k = a.id == "donateBtn" ? "donate" : a.id == "gameBtn" ? "game" : a.closest(".askstats") ? "askstats"
+      : a.matches(".pbtn,.nav a.pill") ? "partner" : "postcard";
+    beacon("/admin/api/click?k=" + k);
+  });
+}
 </script>
