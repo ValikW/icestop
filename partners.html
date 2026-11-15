@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="ru">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>body{margin:0}</style>
@@ -425,6 +426,8 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
 }
 </style>
 
+</head>
+<body>
 <header class="nav glass">
   <div class="in">
     <a class="logo" href="#top">ice.stop</a>
@@ -758,6 +761,18 @@ const DATA = {
 
 };
 // ============================================
+// данные из админки (ice-stop.ru/admin → /data/site.json) поверх DATA; нет файла или ошибка — остаётся DATA
+// ponytail: синхронный запрос — файл маленький и с того же сервера; если станет тормозить, перевести на fetch с перерисовкой
+try {
+  const x = new XMLHttpRequest(); x.open("GET", "/data/site.json?" + Math.floor(Date.now() / 6e4), false); x.send();
+  if (x.status == 200) {
+    const j = JSON.parse(x.responseText);
+    for (const k of ["nowPlace", "coords", "currentKm", "track", "stops", "audience"]) if (j[k] != null) DATA[k] = j[k];
+    if (j.fund) Object.assign(DATA.fund, j.fund);
+    if (j.postcard) Object.assign(DATA.postcard, j.postcard, {antarctica: Object.assign(DATA.postcard.antarctica, j.postcard.antarctica)});
+    if (j.backers) DATA.backers = j.backers.filter(b => !b.hide);
+  }
+} catch (e) {}
 
 const $ = id => document.getElementById(id);
 const fmt = n => n.toLocaleString("ru-RU");
@@ -1216,7 +1231,7 @@ const total = A.reduce((t, a) => t + a.n, 0);
 const short = n => n >= 1e5 ? Math.floor(n / 1e3) + " тыс." : fmt(n);
 $("audTotal").textContent = (total >= 1e4 ? Math.floor(total / 1e3) + " тыс." : fmt(total)) + "+";
 $("people").innerHTML = [...new Set(DATA.audience.map(a => a.who))].map(w => `<div class="t"><div class="who">${w}</div>` +
-  A.filter(a => a.who === w).map(a => `<div class="acc"><div><div class="net">${a.name}</div><div class="hdl">@${a.handle}</div></div><div class="cnt num">${short(a.n)}</div>
+  A.filter(a => a.who === w).map(a => `<div class="acc"><div><div class="net">${a.name}</div>${a.handle ? `<div class="hdl">@${a.handle}</div>` : ""}</div><div class="cnt num">${short(a.n)}</div>
     <div class="anote">${a.note}</div><a class="go chev" href="${a.url}" target="_blank" rel="noopener">Подписаться</a></div>`).join("") + `</div>`).join("");
 $("thanks").innerHTML = DATA.supporters.length ? "Нас уже поддержали: " + DATA.supporters.map(x => `<b>${x}</b>`).join(", ") : "";
 const tgChannel = (DATA.links.find(l => l.name.startsWith("Telegram")) || {}).url;
@@ -1380,3 +1395,5 @@ if (location.hostname.endsWith("ice-stop.ru")) {
   });
 }
 </script>
+</body>
+</html>
