@@ -1232,7 +1232,7 @@ const short = n => n >= 1e5 ? Math.floor(n / 1e3) + " тыс." : fmt(n);
 $("audTotal").textContent = (total >= 1e4 ? Math.floor(total / 1e3) + " тыс." : fmt(total)) + "+";
 $("people").innerHTML = [...new Set(DATA.audience.map(a => a.who))].map(w => `<div class="t"><div class="who">${w}</div>` +
   A.filter(a => a.who === w).map(a => `<div class="acc"><div><div class="net">${a.name}</div>${a.handle ? `<div class="hdl">@${a.handle}</div>` : ""}</div><div class="cnt num">${short(a.n)}</div>
-    <div class="anote">${a.note}</div><a class="go chev" href="${a.url}" target="_blank" rel="noopener">Подписаться</a></div>`).join("") + `</div>`).join("");
+    <div class="anote">${a.views ? `≈ ${a.views >= 1e4 ? Math.round(a.views / 1e3) + " тыс." : fmt(a.views)} просмотров на ролик${a.note ? " · " : ""}` : ""}${a.note}</div><a class="go chev" href="${a.url}" target="_blank" rel="noopener">Подписаться</a></div>`).join("") + `</div>`).join("");
 $("thanks").innerHTML = DATA.supporters.length ? "Нас уже поддержали: " + DATA.supporters.map(x => `<b>${x}</b>`).join(", ") : "";
 const tgChannel = (DATA.links.find(l => l.name.startsWith("Telegram")) || {}).url;
 const partnerHref = DATA.partnerTelegram ? `https://t.me/${DATA.partnerTelegram}?text=${encodeURIComponent("Здравствуйте! Хотим обсудить сотрудничество с экспедицией ice.stop.")}` : DATA.partnerUrl;
