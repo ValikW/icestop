@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Записка создателя · ice.stop</title>
+<meta name="description" content="Как устроен сайт ice-stop.ru и кто его сделал.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shantell+Sans:wght@400;600&family=Neucha&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shantell+Sans:ital,wght,BNCE,INFM,SPAC@0,300..800,-100..100,0..100,-100..100&display=swap">
+<style>
+body{margin:0;background:#ffffff}
+a{color:#0a0a0a}a:hover{color:#d9541e}
+.site-nav a{color:#c9c9c9;text-decoration:none}.site-nav a:hover{color:#ffffff}
+@keyframes note-rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes note-write{to{background-size:100% 100%}}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){.note-write{background:linear-gradient(currentColor,currentColor) no-repeat 0 0/0% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:note-write var(--d,1s) linear var(--at,0s) forwards}}
+@keyframes route-draw{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes route-go{from{top:0}to{top:100%}}
+@keyframes route-ping{0%{transform:scale(1);opacity:.55}100%{transform:scale(3.2);opacity:0}}
+.note-rise{opacity:0;animation:note-rise .9s cubic-bezier(.2,.7,.1,1) forwards}
+.route-line{clip-path:inset(0 0 100% 0);animation:route-draw 5.6s cubic-bezier(.25,.55,.45,1) .6s forwards}
+.route-dot{top:0;animation:route-go 5.6s cubic-bezier(.25,.55,.45,1) .6s forwards}
+.route-ping{opacity:0;animation:route-ping 2.2s ease-out 6.6s infinite}
+.note-cta{text-decoration:none;transition:color .25s ease}
+.note-cta svg{transition:transform .35s cubic-bezier(.2,.7,.1,1)}
+.note-cta:hover svg{transform:translate(6px,-6px)}
+@media (max-width: 720px){.site-nav .nav-link{display:none}.cta-label{display:none}}
+@media (prefers-reduced-motion: reduce){.note-rise{animation:none;opacity:1;transform:none}.route-line{animation:none;clip-path:none}.route-dot{animation:none;top:100%}.route-ping{animation:none}.note-write{animation:none;background-size:100% 100%}.note-cta svg{transition:none}}
+</style>
+</head>
+<body>
+<div style="min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; background: #ffffff">
+
+<!-- ЗАГЛУШКА ШАПКИ: заменить на настоящую шапку сайта ice-stop.ru -->
+<header class="site-nav" style="background: #0b0b0b; border-bottom: 1px solid #2a2a2a; padding: 12px clamp(20px, 4vw, 56px); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; font-family: Inter, system-ui, sans-serif">
+<a href="/" style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: #f5f5f7; padding: 10px 0">ice.stop</a>
+<nav style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 28px; font-size: 15px">
+<a class="nav-link" href="/#route" style="padding: 12px 0">Маршрут</a>
+<a class="nav-link" href="/#diary" style="padding: 12px 0">Дневник</a>
+<a class="nav-link" href="/#postcard" style="padding: 12px 0">Открытки</a>
+<a class="nav-link" href="/#numbers" style="padding: 12px 0">Цифры</a>
+<a class="nav-link" href="/partners.html" style="padding: 12px 0">Партнёрам</a>
+<a href="/#support" style="padding: 12px 18px; border-radius: 999px; background: #ee7340; color: #1a0d05; font-weight: 500">Поддержать</a>
+</nav>
+</header>
+<!-- /ЗАГЛУШКА ШАПКИ -->
+
+<main style="flex: 1; box-sizing: border-box; padding: clamp(20px, 4vw, 56px); background: #ffffff; color: #0a0a0a; font-family: 'Shantell Sans', 'Neucha', cursive; display: flex; flex-direction: column; justify-content: space-between; gap: clamp(48px, 7vw, 88px)">
+
+<div class="note-rise" style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; color: #5c5c5c; animation-delay: 0.1s">
+<span>Валера строит</span>
+<span>Записка к сайту ice-stop.ru</span>
+</div>
+
+<div style="--big: clamp(38px, 7.6vw, 120px); --rail: clamp(56px, 9vw, 132px); position: relative; display: flex; flex-direction: column; gap: clamp(32px, 4.4vw, 56px)">
+
+<div class="route-line" aria-hidden="true" style="position: absolute; left: 0; width: 24px; top: calc(var(--big) / 2); bottom: calc(var(--big) / 2 + 6px); pointer-events: none">
+<svg viewBox="0 0 24 1000" preserveAspectRatio="none" fill="none" style="display: block; width: 100%; height: 100%"><path d="M12 0 C 8 90, 16 170, 12 260 S 9 430, 12 510 S 15 690, 12 770 S 9 920, 12 1000" stroke="#0a0a0a" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="14 10" vector-effect="non-scaling-stroke"></path></svg>
+</div>
+
+<div class="note-rise" style="display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); align-items: start; animation-delay: 0.25s">
+<span aria-hidden="true" style="box-sizing: border-box; width: 18px; height: 18px; margin-left: 3px; margin-top: calc(var(--big) / 2 - 9px); border-radius: 50%; background: #ffffff; border: 2.5px solid #0a0a0a"></span>
+<h1 style="margin: 0; font-family: 'Shantell Sans', 'Neucha', cursive; font-variation-settings: 'INFM' 100, 'BNCE' 20; text-transform: uppercase; font-size: var(--big); font-weight: 600; line-height: 1; letter-spacing: -0.01em"><span class="note-write" style="--at: 0.3s; --d: 1.2s">Этот сайт ведёт себя сам</span></h1>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: clamp(20px, 2.6vw, 34px)">
+<div class="note-rise" style="display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); align-items: baseline; animation-delay: 1.5s">
+<div style="display: flex; align-items: center; gap: 10px">
+<span aria-hidden="true" style="flex: none; box-sizing: border-box; width: 14px; height: 14px; margin-left: 5px; border-radius: 50%; background: #ffffff; border: 2.5px solid #0a0a0a"></span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.04em; color: #5c5c5c">01</span>
+</div>
+<p style="margin: 0; max-width: 36em; font-family: 'Shantell Sans', 'Neucha', cursive; font-variation-settings: 'INFM' 100, 'BNCE' 20; text-transform: uppercase; font-size: clamp(17px, 1.75vw, 25px); font-weight: 400; line-height: 1.4; letter-spacing: 0.04em; color: #3a3a3a"><span class="note-write" style="--at: 1.6s; --d: 0.9s">Ребята пишут в Telegram — дневник на сайте собирается сам.</span></p>
+</div>
+<div class="note-rise" style="display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); align-items: baseline; animation-delay: 2.5s">
+<div style="display: flex; align-items: center; gap: 10px">
+<span aria-hidden="true" style="flex: none; box-sizing: border-box; width: 14px; height: 14px; margin-left: 5px; border-radius: 50%; background: #ffffff; border: 2.5px solid #0a0a0a"></span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.04em; color: #5c5c5c">02</span>
+</div>
+<p style="margin: 0; max-width: 36em; font-family: 'Shantell Sans', 'Neucha', cursive; font-variation-settings: 'INFM' 100, 'BNCE' 20; text-transform: uppercase; font-size: clamp(17px, 1.75vw, 25px); font-weight: 400; line-height: 1.4; letter-spacing: 0.04em; color: #3a3a3a"><span class="note-write" style="--at: 2.6s; --d: 0.5s">Точка на карте едет за ними.</span></p>
+</div>
+<div class="note-rise" style="display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); align-items: baseline; animation-delay: 3.1s">
+<div style="display: flex; align-items: center; gap: 10px">
+<span aria-hidden="true" style="flex: none; box-sizing: border-box; width: 14px; height: 14px; margin-left: 5px; border-radius: 50%; background: #ffffff; border: 2.5px solid #0a0a0a"></span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.04em; color: #5c5c5c">03</span>
+</div>
+<p style="margin: 0; max-width: 36em; font-family: 'Shantell Sans', 'Neucha', cursive; font-variation-settings: 'INFM' 100, 'BNCE' 20; text-transform: uppercase; font-size: clamp(17px, 1.75vw, 25px); font-weight: 400; line-height: 1.4; letter-spacing: 0.04em; color: #3a3a3a"><span class="note-write" style="--at: 3.2s; --d: 0.8s">Поддержать экспедицию — в два клика с сайта.</span></p>
+</div>
+</div>
+
+<div class="note-rise" style="display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); align-items: baseline; animation-delay: 4s">
+<div style="display: flex; align-items: center">
+<span aria-hidden="true" style="flex: none; box-sizing: border-box; width: 14px; height: 14px; margin-left: 5px; border-radius: 50%; background: #ffffff; border: 2.5px solid #0a0a0a"></span>
+</div>
+<p style="margin: 0; max-width: 24em; font-family: 'Shantell Sans', 'Neucha', cursive; font-variation-settings: 'INFM' 100, 'BNCE' 20; text-transform: uppercase; font-size: clamp(22px, 2.7vw, 40px); font-weight: 600; line-height: 1.2; letter-spacing: 0.01em"><span class="note-write" style="--at: 4.1s; --d: 1.9s">Сделал его я, Валера. Делаю такое и другим: сайты, ИИ-агентов и всё, что может работать само. Нужно что-то похожее —</span></p>
+</div>
+
+<div class="note-rise" style="display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); align-items: center; animation-delay: 6s">
+<span aria-hidden="true"></span>
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px">
+<a class="note-cta" href="https://t.me/valik_vw" target="_blank" rel="noopener" style="color: #d9541e; text-decoration: underline wavy; text-decoration-thickness: 2px; text-underline-offset: 8px; display: inline-flex; align-items: center; gap: 0.2em; padding: 6px 0; white-space: nowrap; font-family: 'Shantell Sans', 'Neucha', cursive; font-variation-settings: 'INFM' 100, 'BNCE' 20; text-transform: uppercase; font-size: var(--big); font-weight: 600; line-height: 1; letter-spacing: -0.01em"><span class="note-write" style="--at: 6.1s; --d: 0.6s">напиши мне</span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="width: 0.6em; height: 0.6em; flex: none"><path d="M6 18L18 6M8 6h10v10"></path></svg></a>
+<span class="cta-label" style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; color: #5c5c5c; padding-bottom: 14px">Telegram</span>
+</div>
+</div>
+
+<div aria-hidden="true" style="position: absolute; left: 0; width: 24px; top: calc(var(--big) / 2); bottom: calc(var(--big) / 2 + 6px); pointer-events: none">
+<div class="route-dot" style="position: absolute; left: 1px; width: 22px; height: 22px; margin-top: -11px">
+<span class="route-ping" style="position: absolute; inset: 0; border-radius: 50%; background: #ee7340"></span>
+<span style="position: absolute; inset: 0; border-radius: 50%; background: #ee7340"></span>
+</div>
+</div>
+
+</div>
+
+</main>
+</div>
+</body>
+</html>
