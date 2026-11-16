@@ -366,6 +366,7 @@ footer{position:sticky;bottom:0;z-index:0;overflow:hidden;padding-block:40px 0;b
 /* мини-игра в подвале: бегун по льдинам, одна кнопка — прыжок */
 .glass-pill{background:var(--tile);color:var(--ink)}
 .gbar{position:relative;z-index:3;text-align:center;padding:18px 16px 28px}
+.game-cta{min-height:56px;padding:0 26px;font-size:17px;white-space:nowrap;font-weight:600;box-shadow:0 10px 30px color-mix(in srgb,var(--accent) 45%,transparent)}
 footer.playing .floes,footer.playing .gbar{display:none}
 .game{position:relative;z-index:3;margin:16px auto 0;max-width:980px;padding:0 16px 24px}
 #gcv{display:block;width:100%;height:300px;border-radius:24px;background:var(--sea-bg);touch-action:none;cursor:pointer;outline:1px solid var(--line)}
@@ -615,7 +616,7 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
   <div class="in credit" id="credit"></div>
   <div class="word" aria-hidden="true">ice<b>.</b>stop</div>
   <div class="floes" id="floes" aria-hidden="true"></div>
-  <div class="gbar"><button class="pill glass-pill" id="gameBtn">Играть: доплыви до Антарктиды</button></div>
+  <div class="gbar"><button class="pill game-cta" id="gameBtn">▶ Играть: доплыви до Антарктиды</button></div>
   <div class="game" id="game" hidden>
     <canvas id="gcv" aria-label="Мини-игра: прыгайте по льдинам"></canvas>
     <div class="gpanel" id="gpanel"></div>
@@ -696,7 +697,7 @@ const DATA = {
   nowPlace: "Ирак · Багдад",
   coords: [33.3152, 44.3661], // широта, долгота — точка на карте (сюда потом пойдёт GPS-маячок)
   nextGoal: "Саудовская Аравия", nextNote: "· дальше Египет",
-  hitch: {cars:31, avgWait:"42 мин", longestWait:"5 ч 30 мин", trucks:9, countries:4, refusals:"~700"},
+  hitch: {cars:310, avgWait:"42 мин", longestWait:"5 ч 30 мин", trucks:9, countries:4, refusals:"~700"},
   nights: {"Палатка":9, "У водителей":8, "Каучсёрфинг":6, "Гестхаус":3},
   fund: {raised:240, goal:5000, currency:"$", note:"на визы, снаряжение для холода и страховку для антарктического участка",
     donateUrl:"https://web.tribute.tg/d/U6q",
