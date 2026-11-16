@@ -570,6 +570,7 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
       <p class="sub">Двое блогеров едут автостопом на край Земли и каждый день показывают дорогу в кружочках, рилсах и постах. Сейчас: <b id="ppNow"></b>.</p>
       <div class="pstats">
         <div><b class="num" id="ppAud"></b><span>подписчиков у Семёна и Рустама</span></div>
+        <div id="ppV30w" hidden><b class="num" id="ppV30"></b><span>просмотров роликов за месяц</span></div>
         <div><b class="num" id="ppKm"></b><span>уже пройдено автостопом</span></div>
         <div><b class="num" id="ppDays"></b><span>в дороге каждый день</span></div>
         <div><b class="num" id="ppPosts">600+</b><span>записей с дороги в Telegram</span></div>
@@ -581,7 +582,7 @@ footer .in{display:flex;justify-content:space-between;align-items:center;gap:16p
   <section class="alt" id="audience">
     <div class="in">
       <div class="head"><h2>Аудитория.</h2><p>Столько людей следят за дорогой в Антарктиду.</p></div>
-      <div class="aud-total"><div class="big num" id="audTotal"></div><p>подписчиков на всех площадках</p></div>
+      <div class="aud-total"><div class="big num" id="audTotal"></div><p>подписчиков на всех площадках</p><p id="audV30"></p></div>
       <div class="people" id="people"></div>
       <div class="askstats">
         <p><b>Нужны подробные цифры?</b> Охваты, регионы, возраст, статистика сторис и рилс — напишите, пришлём всё прямо в переписке, сразу и без лишних вопросов.</p>
@@ -1228,11 +1229,14 @@ $("floes").innerHTML = [[13,3.2,0],[22,4.2,-9],[9,2.6,-17],[28,4.8,-26],[15,3.6,
 }
 const A = DATA.audience.filter(a => a.n);
 const total = A.reduce((t, a) => t + a.n, 0);
+const big = n => n >= 1e6 ? (n / 1e6).toFixed(1).replace(".0", "").replace(".", ",") + " млн" : Math.round(n / 1e3) + " тыс.";
+const v30 = DATA.audience.reduce((t, a) => t + (a.views30 || 0), 0);
 const short = n => n >= 1e5 ? Math.floor(n / 1e3) + " тыс." : fmt(n);
+if (v30) $("audV30").innerHTML = `и <b>≈ ${big(v30)}</b> просмотров роликов в Instagram за месяц`;
 $("audTotal").textContent = (total >= 1e4 ? Math.floor(total / 1e3) + " тыс." : fmt(total)) + "+";
 $("people").innerHTML = [...new Set(DATA.audience.map(a => a.who))].map(w => `<div class="t"><div class="who">${w}</div>` +
   A.filter(a => a.who === w).map(a => `<div class="acc"><div><div class="net">${a.name}</div>${a.handle ? `<div class="hdl">@${a.handle}</div>` : ""}</div><div class="cnt num">${short(a.n)}</div>
-    <div class="anote">${a.views ? `≈ ${a.views >= 1e4 ? Math.round(a.views / 1e3) + " тыс." : fmt(a.views)} просмотров на ролик${a.note ? " · " : ""}` : ""}${a.note}</div><a class="go chev" href="${a.url}" target="_blank" rel="noopener">Подписаться</a></div>`).join("") + `</div>`).join("");
+    <div class="anote">${a.views ? `≈ ${a.views >= 1e4 ? Math.round(a.views / 1e3) + " тыс." : fmt(a.views)} просмотров на ${a.name == "Telegram" ? "пост" : "ролик"}${a.views30 ? ` · ≈ ${big(a.views30)} за месяц` : ""}${a.note ? " · " : ""}` : ""}${a.note}</div><a class="go chev" href="${a.url}" target="_blank" rel="noopener">Подписаться</a></div>`).join("") + `</div>`).join("");
 $("thanks").innerHTML = DATA.supporters.length ? "Нас уже поддержали: " + DATA.supporters.map(x => `<b>${x}</b>`).join(", ") : "";
 const tgChannel = (DATA.links.find(l => l.name.startsWith("Telegram")) || {}).url;
 const partnerHref = DATA.partnerTelegram ? `https://t.me/${DATA.partnerTelegram}?text=${encodeURIComponent("Здравствуйте! Хотим обсудить сотрудничество с экспедицией ice.stop.")}` : DATA.partnerUrl;
@@ -1241,6 +1245,7 @@ if (document.documentElement.classList.contains("pp")) {
   { const nb = document.querySelector(".nav a.pill"); nb.textContent = "Обсудить"; nb.href = partnerHref; nb.target = "_blank"; }
   $("ppNow").textContent = DATA.nowPlace.replace(" · ", ", ");
   $("ppAud").textContent = $("audTotal").textContent;
+  if (v30) { $("ppV30").textContent = "≈ " + big(v30); $("ppV30w").hidden = false; }
   $("ppKm").textContent = fmt(DATA.currentKm) + " км";
   { const d = Math.floor((Date.now() - new Date(DATA.startDate)) / dayMs) + 1; $("ppDays").textContent = d + " " + (d % 10 === 1 && d % 100 !== 11 ? "день" : d % 10 >= 2 && d % 10 <= 4 && (d % 100 < 10 || d % 100 >= 20) ? "дня" : "дней"); }
   $("pex").hidden = true;
