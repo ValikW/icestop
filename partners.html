@@ -851,11 +851,11 @@ const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;
 const clip = (t, n) => { t = String(t || "").replace(/\s+/g, " ").trim(); return t.length > n ? t.slice(0, n).replace(/\s\S*$/, "") + "…" : t; };
 let feedDays = null, diaryShown = 7, diaryWho = "all";
 const placeOn = day => { let pl = ""; DATA.track.forEach(t => { if (t.date <= day) pl = t.place.split(" · ").pop(); }); return pl; };
-const postBody = p => p.title || p.text || p.transcript || "";
+const postBody = p => p.title || p.summary || p.text || p.transcript || "";
 const postHTML = (p, main) => {
   const m = p.kind === "circle" || p.kind === "video" ? `<button class="rv" aria-label="Смотреть: ${p.author}"><video src="${FEED + p.media}" poster="${p.poster ? FEED + p.poster : ""}" preload="none" playsinline></video></button>`
     : p.kind === "photo" && p.media ? `<img src="${FEED + p.media}" alt="" loading="lazy">` : "";
-  const txt = p.text || p.transcript || "";
+  const txt = p.summary ?? (p.text || p.transcript || "");  // "" = в кружочке нет сути, дословщину не показываем
   return `<div class="fpost${m ? "" : " nomedia"}">${m ? `<div class="fmedia">${m}</div>` : ""}<div><div class="who">${p.author}${p.kind === "circle" ? " · кружочек" : p.kind === "voice" ? " · голосовое" : ""}</div>` +
     (main && p.title ? `<h3>${esc(p.title)}</h3>` : "") + `<p>${esc(main ? clip(txt, 280) : clip(txt, 200))}</p> <a class="tg" href="${p.url}" target="_blank" rel="noopener">в Telegram ›</a></div></div>`;
 };
@@ -1320,7 +1320,7 @@ addEventListener("DOMContentLoaded", () => {
   feedReady.then(fd => { if (!fd || !routeFracDay) return;
     stages = fd.slice().reverse().map(d => { const m = d.posts.find(p => p.id === d.main) || d.posts[0];
       const dn = Math.floor((new Date(d.day) - new Date(DATA.startDate)) / dayMs) + 1;
-      return {f: routeFracDay(d.day), t: `День ${dn}${d.place ? " · " + esc(d.place) : ""} · ${esc(clip(d.title || m.title || m.text || m.transcript, 110))}`, d: new Date(d.day),
+      return {f: routeFracDay(d.day), t: `День ${dn}${d.place ? " · " + esc(d.place) : ""} · ${esc(clip(d.title || m.title || m.summary || m.text || m.transcript, 110))}`, d: new Date(d.day),
         photo: m.kind === "photo" ? FEED + m.media : m.poster ? FEED + m.poster : (d.posts.find(p => p.kind === "photo") ? FEED + d.posts.find(p => p.kind === "photo").media : "")}; })
       .sort((a, b) => a.f - b.f || a.d - b.d);
     lastStage = -1; routeTick(); });
